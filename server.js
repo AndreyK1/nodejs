@@ -24,7 +24,7 @@ app.delete('/pkgs/:id', pkgs.deletePkg);
 
 app.listen(3000)
 
-
+/*
 //подключение к POSTGRE
 var connectionStringIn = nconf.get("POSTGRE_URI");
 
@@ -55,7 +55,7 @@ console.log("length-"+results.length)
 for(var i=0; i<results.length; i++ ){
     console.log(results[i][0]+" - "+results[i][1])
 }
-
+*/
 //SQL Query > Create Table
 //var query = client.query('CREATE TABLE items(id SERIAL PRIMARY KEY, text VARCHAR(40) not null, complete BOOLEAN)');
 //query.on('end', function() { client.end(); });

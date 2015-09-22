@@ -1,0 +1,4 @@
+{
+  "POSTGRE_URI" :
+   "postgres://postgreadmin:7654321@192.168.123.159:5432/AndeyBD"
+}
