@@ -26,7 +26,7 @@ app.listen(3000)
 
 /*
 //подключение к POSTGRE
-var connectionStringIn = nconf.get("POSTGRE_URI");
+var connectionStringIn =nconf.get("POSTGRE_URI");
 
 var pg = require('pg');
 var connectionString = process.env.DATABASE_URL || connectionStringIn
