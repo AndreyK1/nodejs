@@ -26,15 +26,13 @@ var jwt        = require("jsonwebtoken");
 //var mongoose   = require("mongoose");
 var app        = express();
 
-
+/*
 nconf.env().file({ file: 'config.json' });
 
 var User = sequelize.define('User', {
     email: Sequelize.STRING,
     password: Sequelize.STRING
 });
-
-
 
 User.sync({force: true}).then(function () {
     // Table created
@@ -43,7 +41,7 @@ User.sync({force: true}).then(function () {
         password: 'Hancock'
     });
 });
-/*
+
 sequelize.sync().then(function() {
     return User.create({
         email: 'вапвап',
@@ -54,41 +52,10 @@ sequelize.sync().then(function() {
         plain: true
     }))
 });*/
-/*
-var User = sequelize.define('users', {
-    email: Sequelize.STRING,
-    password: Sequelize.STRING//,
-    //token: Sequelize.STRING
-}, {
-    instanceMethods: {
-        retrieveAll: function(onSuccess, onError) {
-            User.findAll({}, {raw: true})
-                .success(onSuccess).error(onError);
-        },
-        retrieveById: function(user_id, onSuccess, onError) {
-            User.find({where: {id: user_id}}, {raw: true})
-                .success(onSuccess).error(onError);
-        } ,
-        add: function(onSuccess, onError) {
-            var email = this.email;
-            var password = this.password;
-
-
-            User.build({ email: email, password: password })
-                .save().success(onSuccess).error(onError);
-        }
-    }
-}
-);
-*/
-
-
-
-
 
 
 var port = process.env.PORT || 3001;
-//var User = require('./models/Userseq');
+var User = require('./models/Userseq');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -106,13 +73,14 @@ app.post('/authenticate', function(req, res) {
     var email = req.body.email
     var password = req.body.password
     console.log(email+"---"+password)
-    var user = User.create({ email: email, password: password });
-    /*user.add(function(success){
+    var user = User.build({ email: email, password: password });
+
+    user.add(function(success){
         res.json({ message: 'User created!' });
         },
         function(err) {
             res.send(err);
-        });*/
+        });
     //User.findOne({email: req.body.email, password: req.body.password}, function(err, user) {
 /*
     User.findOne({email:req.body.email, password: req.body.password}, function(err, user) {
@@ -136,8 +104,8 @@ app.post('/authenticate', function(req, res) {
             }
         }
     });*/
-});
 
+});	
 
 /*
 app.post('/authenticate', function(req, res) {
