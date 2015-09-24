@@ -16,18 +16,29 @@ var User = sequelize.define('users', {
                 .success(onSuccess).error(onError);
         },
         retrieveById: function(user_id, onSuccess, onError) {
-            User.find({where: {id: user_id}}, {raw: true})
-                .success(onSuccess).error(onError);
+            //User.find({where: {id: user_id, email: 'eeeee2'}})
+            User.find({where: {id: user_id}})
+                .then(function(user){
+                    onSuccess(user)
+                    console.log('sssssssssssss');
+                }).catch(function(e) {
+                    onError()
+                    console.log("Project update failederewrewrew !");
+                });
         } ,
-        add: function(onSuccess, onError) {
+            add: function(onSuccess, onError) {
             var email = this.email;
             var password = this.password;
 
 
             User.build({ email: email, password: password })
-			.save().then(function(){ console.log('sssssssssssss');}).catch(function(e) {
-    console.log("Project update failederewrewrew !");
-})
+			.save().then(function(){
+                    onSuccess()
+                    console.log('sssssssssssss');
+                }).catch(function(e) {
+                    onError()
+                    console.log("Project update failederewrewrew !");
+                });
 			/*.on('success', function(id){
 				console.log('sssssssssssss');
 			});*/

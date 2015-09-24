@@ -2,7 +2,8 @@ var Sequelize = require('sequelize')
 var nconf = require('nconf');
 nconf.env().file({ file: 'config.json' });
 //var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
-var sequelize = new Sequelize("postgres://postgreadmin:7654321@192.168.123.159:5432/AndeyBD");
+//var sequelize = new Sequelize("postgres://postgreadmin:7654321@192.168.123.159:5432/AndeyBD");
+var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
 /*
 var sequelize = new Sequelize(
     "AndeyBD",
@@ -56,6 +57,10 @@ sequelize.sync().then(function() {
 
 var port = process.env.PORT || 3001;
 var User = require('./models/Userseq');
+var Messages = require('./models/messagesSeq');
+
+User.hasMany(Messages, {foreignKey: 'user_id' });
+//http://sequelize.readthedocs.org/en/latest/api/associations/index.html?highlight=hasMany
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -104,8 +109,52 @@ app.post('/authenticate', function(req, res) {
             }
         }
     });*/
+});
 
-});	
+app.get('/getById/:user_id', function(req, res) {
+    var user = User.build();
+
+    user.retrieveById(req.params.user_id, function(users) {
+        if (users) {
+            res.json(users);
+        } else {
+            res.send(401, "User not found1");
+        }
+    }, function(error) {
+        res.send("User not found2");
+    });
+
+});
+
+//
+//Messages.build({ text: "dfhdghdfgdfgdfg", user_id: 5 }).save()
+
+app.get('/getMesById/:user_id/:mess_id', function(req, res) {
+    var user = User.build();
+
+    user.retrieveById(req.params.user_id, function(users) {
+        if (users) {
+                 //users.getMessages({where: {id: req.params.mess_id}}).then(function(mess) {
+                    users.getMessages({where: {id: req.params.mess_id}}).then(function(mess) {
+                        if (mess) {
+                            res.json(mess);
+                        } else {
+                            res.send(401, "Mess not found1");
+                        }
+                    }).catch(function(e) {
+                        res.send("Mess not found2");
+                    }
+                  )
+            //res.json(users);
+        } else {
+            res.send(401, "User not found1");
+        }
+        },
+        function(error) {
+        res.send("User not found2");
+    });
+
+});
 
 /*
 app.post('/authenticate', function(req, res) {
