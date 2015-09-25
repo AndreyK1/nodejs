@@ -57,9 +57,9 @@ sequelize.sync().then(function() {
 
 var port = process.env.PORT || 3001;
 var User = require('./models/Userseq');
-var Messages = require('./models/messagesSeq');
+var Message = require('./models/messagesSeq');
 
-User.hasMany(Messages, {foreignKey: 'user_id' });
+User.hasMany(Message, {foreignKey: 'user_id' });
 //http://sequelize.readthedocs.org/en/latest/api/associations/index.html?highlight=hasMany
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -72,89 +72,142 @@ app.use(function(req, res, next) {
     next();
 });
 
-
-app.post('/authenticate', function(req, res) {
+//создание определ-го полльзователя
+/*curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"email\":\"eeeee\", \"password\":\"ppp\" }" http://localhost:3001/signin
+*/
+app.post('/signin', function(req, res) {
     //console.log(req.body.email);
     var email = req.body.email
-    var password = req.body.password
-    console.log(email+"---"+password)
-    var user = User.build({ email: email, password: password });
-
-    user.add(function(success){
-        res.json({ message: 'User created!' });
+	var password = req.body.password
+	
+	//проверяем есть ли такой пользователь
+		console.log('HERE-5');
+	    user = User.build();
+		user.getByEmail(email, function(users) {
+			if (users) {
+				
+				res.json({ message: 'Such User Already Exist!' });
+				console.log('Such User Already Exist');
+				//res.send(401, "Such User Already Exist");
+				//res.json(users);
+			} else {
+				AddUser();
+			}
         },
-        function(err) {
-            res.send(err);
+        function(error) {
+        res.send("User error");
+    });
+	
+    
+	function AddUser(){
+		console.log('Adding user - '+email+"---"+password)
+		var token = jwt.sign({email,password}, process.env.JWT_SECRET || 'secret key'); 
+		console.log('token-'+token);	
+		var user = User.build({ email: email, password: password, token:token});
+
+
+		user.add(function(success){
+			res.json({ message: 'User created!' });
+			},
+			function(err) {
+				res.send(err);
         });
-    //User.findOne({email: req.body.email, password: req.body.password}, function(err, user) {
-/*
-    User.findOne({email:req.body.email, password: req.body.password}, function(err, user) {
-        if (err) {
-            res.json({
-                type: false,
-                data: "Error occured: " + err
-            });
-        } else {
-            if (user) {
-                res.json({
-                    type: true,
-                    data: user,
-                    token: user.token
-                });
-            } else {
-                res.json({
-                    type: false,
-                    data: "Incorrect email/password"
-                });
-            }
-        }
-    });*/
+	}
 });
 
+//вытаскивание определ-го полльзователя
+//http://localhost:3001/getById/5
 app.get('/getById/:user_id', function(req, res) {
     var user = User.build();
+	GetUser(user,req,res);
+});
 
-    user.retrieveById(req.params.user_id, function(users) {
-        if (users) {
-            res.json(users);
-        } else {
-            res.send(401, "User not found1");
-        }
-    }, function(error) {
-        res.send("User not found2");
-    });
+//создание сообщения в базе у определ-го пользователя
+/*
+curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"text\":\"new message\", \"user_id\":5 }" http://localhost:3001/addMessage
+ */
+app.post('/addMessage', function(req, res) {
+    //console.log(req.body.email);
+    
+	var text = req.body.text
+	var user_id = req.body.user_id
+    console.log(text+"---"+user_id)
+	
+
+	
+	
+	//вытаскиваем пользователя
+    var user = User.build();
+	//	GetUser(user,req,res,);	
+	
+		    user.retrieveById(user_id, function(users) {
+			if (users) {
+					//res.json(users);
+					var message = Message.build({ text: text}).save().then(function(message){
+                    users.addMessage(message); console.log('sssFFFFFssssssssss');});				
+				
+					
+					
+				}else {
+				res.send(401, "User not found1");
+			}
+			},
+				function(error) {
+				res.send("User not found2");
+				}
+			);	
+	
+	//user.getMessages(
 
 });
 
-//
+
+//создание  сообщенияв базе
 //Messages.build({ text: "dfhdghdfgdfgdfg", user_id: 5 }).save()
 
+//вытаскиваем определ-ое сообщение у опред-го полльзователя
+//http://localhost:3001/getMesById/5/1
 app.get('/getMesById/:user_id/:mess_id', function(req, res) {
     var user = User.build();
+		GetUser(user,req,res);
+});
 
-    user.retrieveById(req.params.user_id, function(users) {
-        if (users) {
+
+function GetUser(user,req,res){
+		console.log('HERE-1');
+	    user.retrieveById(req.params.user_id, function(users) {
+			if (users) {
                  //users.getMessages({where: {id: req.params.mess_id}}).then(function(mess) {
-                    users.getMessages({where: {id: req.params.mess_id}}).then(function(mess) {
-                        if (mess) {
-                            res.json(mess);
-                        } else {
-                            res.send(401, "Mess not found1");
-                        }
-                    }).catch(function(e) {
-                        res.send("Mess not found2");
-                    }
-                  )
+                   if(req.params.mess_id){//вытаскиваем сообщение
+					   GetMessage(users,req,res);
+				   }else{//вытаскиваем пользователя
+					   console.log('HERE-3');
+					   res.json(users);
+				   }
+
             //res.json(users);
-        } else {
-            res.send(401, "User not found1");
-        }
+			} else {
+				res.send(401, "User not found1");
+			}
         },
         function(error) {
         res.send("User not found2");
-    });
+    });	
+}
 
-});
+function GetMessage(user,req,res){
+	   console.log('HERE-2');
+	   user.getMessages({where: {id: req.params.mess_id}}).then(function(mess) {
+		if (mess) {
+			res.json(mess);
+		} else {
+			res.send(401, "Mess not found1");
+		}
+	}).catch(function(e) {
+			res.send("Mess not found2");
+		}
+	)	
+}
 
 /*
 app.post('/authenticate', function(req, res) {

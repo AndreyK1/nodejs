@@ -1,4 +1,4 @@
-﻿-- Table: users
+﻿--- Table: users
 
 -- DROP TABLE users;
 
@@ -9,6 +9,7 @@ CREATE TABLE users
   password character varying(255),
   "createdAt" timestamp with time zone NOT NULL,
   "updatedAt" timestamp with time zone NOT NULL,
+  token character varying(255),
   CONSTRAINT "Users_pkey" PRIMARY KEY (id)
 )
 WITH (
@@ -16,6 +17,7 @@ WITH (
 );
 ALTER TABLE users
   OWNER TO postgreadmin;
+
   
   
   -- Table: messages

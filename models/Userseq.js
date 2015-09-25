@@ -7,8 +7,8 @@ var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
 
 var User = sequelize.define('users', {
     email: Sequelize.STRING,
-    password: Sequelize.STRING//,
-    //token: Sequelize.STRING
+    password: Sequelize.STRING,
+    token: Sequelize.STRING
 }, {
     instanceMethods: {
         retrieveAll: function(onSuccess, onError) {
@@ -25,27 +25,32 @@ var User = sequelize.define('users', {
                     onError()
                     console.log("Project update failederewrewrew !");
                 });
-        } ,
+        },
             add: function(onSuccess, onError) {
             var email = this.email;
             var password = this.password;
+			var	token = this.token;
 
-
-            User.build({ email: email, password: password })
+            User.build({ email: email, password: password, token:token })
 			.save().then(function(){
                     onSuccess()
-                    console.log('sssssssssssss');
+                    console.log('add - sucsess');
                 }).catch(function(e) {
                     onError()
                     console.log("Project update failederewrewrew !");
                 });
-			/*.on('success', function(id){
-				console.log('sssssssssssss');
-			});*/
-				//{function(){ console.log('sssssssssssss');}}
-				//.success(function(){ console.log('sssssssssssss');});    //success(onSuccess); //.error(onError);
-			
-		}
+		},
+           getByEmail: function(email, onSuccess, onError) {
+            //User.find({where: {id: user_id, email: 'eeeee2'}})
+            User.find({where: {email: email}})
+                .then(function(user){
+                    onSuccess(user)
+                    console.log('getByEmail-sucsess');
+                }).catch(function(e) {
+                    onError()
+                    console.log("Project update failederewrewrew !");
+                });
+        }
     }
 }
 );
