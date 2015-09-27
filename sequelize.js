@@ -74,7 +74,7 @@ app.use(function(req, res, next) {
 
 //создание определ-го полльзователя
 /*curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"email\":\"eeeee\", \"password\":\"ppp\" }" http://localhost:3001/signin
-*/
+    */
 app.post('/signin', function(req, res) {
     //console.log(req.body.email);
     var email = req.body.email
@@ -101,7 +101,7 @@ app.post('/signin', function(req, res) {
     
 	function AddUser(){
 		console.log('Adding user - '+email+"---"+password)
-		var token = jwt.sign({email,password}, process.env.JWT_SECRET || 'secret key'); 
+		var token = jwt.sign({email:email,password:password}, process.env.JWT_SECRET || 'secret key');
 		console.log('token-'+token);	
 		var user = User.build({ email: email, password: password, token:token});
 
@@ -132,7 +132,7 @@ app.post('/addMessage', function(req, res) {
 	var text = req.body.text
 	var user_id = req.body.user_id
     console.log(text+"---"+user_id)
-	
+
 
 	
 	
