@@ -106,8 +106,17 @@ app.post('/signin', function(req, res) {
 		var user = User.build({ email: email, password: password, token:token});
 
 
-		user.add(function(success){
-			res.json({ message: 'User created!' });
+		user.add(function(user){
+			//res.json(user);
+						console.log('aded 11')
+			            res.json({
+                            type: true,
+                            data: user,
+                            token: user.token
+                        });
+			
+			
+			//res.json({ message: 'User created!' });
 			},
 			function(err) {
 				res.send(err);
@@ -121,6 +130,8 @@ app.get('/getById/:user_id', function(req, res) {
     var user = User.build();
 	GetUser(user,req,res);
 });
+
+
 
 //создание сообщения в базе у определ-го пользователя
 /*
@@ -238,7 +249,37 @@ app.post('/authenticate', function(req, res) {
 });
 */
 
+app.get('/me', ensureAuthorized, function(req, res) {
+    User.findOne({token: req.token}, function(err, user) {
+        if (err) {
+			console.log('Error HERE-6');
+            res.json({
+                type: false,
+                data: "Error occured: " + err
+            });
+        } else {
+			console.log('Ok HERE-7');
+            res.json({
+                type: true,
+                data: user
+            });
+        }
+    });
+});
 
+function ensureAuthorized(req, res, next) {
+    var bearerToken;
+    var bearerHeader = req.headers["authorization"];
+	console.log('bearerHeader HERE-8'+bearerHeader);
+    if (typeof bearerHeader !== 'undefined') {
+        var bearer = bearerHeader.split(" ");
+        bearerToken = bearer[1];
+        req.token = bearerToken;
+        next();
+    } else {
+        res.send(403);
+    }
+}
 
 process.on('uncaughtException', function(err) {
     console.log(err);

@@ -32,8 +32,8 @@ var User = sequelize.define('users', {
 			var	token = this.token;
 
             User.build({ email: email, password: password, token:token })
-			.save().then(function(){
-                    onSuccess()
+			.save().then(function(user){
+                    onSuccess(user)
                     console.log('add - sucsess');
                 }).catch(function(e) {
                     onError()
