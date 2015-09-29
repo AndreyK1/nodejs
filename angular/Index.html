@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js"></script>-->
+		  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular-route.js"></script>	
+	
+	<script src="https://cdn.jsdelivr.net/ngstorage/0.3.6/ngStorage.min.js"></script>
+
+
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular-route.js" type="javascript"></script>-->
+
+	 <script src="scripts/controllers.js"></script>
+	    <script>
+
+    </script>
+	
+	<title>Restful Authentication with NodeJS & AngularJS</title>
+	
+	<!-- Bootstrap core CSS 
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/lib/loading-bar.css">-->
+
+    <style>
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body ng-app="angularRestfulAuth">
+    <div>
+	    <label>Имя:</label>
+	    <input type="text" ng-model="yourName">
+	    <hr>
+	    <h1>+Привет1, {{yourName}}!</h1>
+    </div>
+	    
+		
+		
+		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation" data-ng-controller="HomeCtrl">
+                           <div data-ng-hide="token"><span ng-click="signin()">Signin</span></div>
+						   <div data-ng-hide="token"><span ng-click="getme()">getme</span></div>
+
+						   <input type='text' name='email' ng-model='email' />
+						   <input type='text' name='password' ng-model='password' />
+						   <br /><br />
+						   
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a ng-href="#/">Home</a></li>
+                    <li data-ng-show="token"><a ng-href="#/me">Me</a></li>
+                    <li data-ng-hide="token"><a ng-href="#/signin">Signin</a></li>
+                    <li data-ng-hide="token"><a ng-href="#/signup">Signup</a></li>
+                    <li data-ng-show="token"><a ng-click="logout()">Logout</a></li>
+                </ul>
+            </div>
+    <div class="container" ng-view="">
+
+    </div> <!-- /container -->			
+						   
+						   <div>
+								<div>email - {{user.email}}</div>
+								<div>password - {{user.password}}</div>
+								<div>token - {{user.token}}</div>
+								<div>localStorage.token - {{tokenll}}</div>
+								<div>user - {{user}}</div>
+						   </div>						   
+						   
+	   
+	   <!--<div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Angular Restful Auth</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a ng-href="#/">Home</a></li>
+                    <li data-ng-show="token"><a ng-href="#/me">Me</a></li>
+                    <li data-ng-hide="token"><a ng-href="#/signin">Signin</a></li>
+                    <li data-ng-hide="token"><a ng-href="#/signup">Signup</a></li>
+                    <li data-ng-show="token"><a ng-click="logout()">Logout</a></li>
+                </ul>
+            </div> 
+        </div>-->
+    </div>
+	
+	
+</body>
+</html>
