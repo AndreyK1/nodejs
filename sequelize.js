@@ -250,7 +250,25 @@ app.post('/authenticate', function(req, res) {
 */
 
 app.get('/me', ensureAuthorized, function(req, res) {
-    User.findOne({token: req.token}, function(err, user) {
+	
+   // User.findOne({token: req.token}, function(err, user) {
+	   User.find({where: {token: req.token}})
+	   .then(function(user){
+					res.json({
+						type: true,
+						data: user
+					});
+                    console.log('Ok HERE-7');
+					//console.log('sssssssssssss');
+                }).catch(function(e) {
+                    res.json({
+						type: false,
+						data: "Error occured: " + err
+					});
+                    console.log('Error HERE-6');
+					//console.log("Project update failederewrewrew !");
+                });
+	   /*, function(err, user) {
         if (err) {
 			console.log('Error HERE-6');
             res.json({
@@ -264,7 +282,7 @@ app.get('/me', ensureAuthorized, function(req, res) {
                 data: user
             });
         }
-    });
+    });*/
 });
 
 function ensureAuthorized(req, res, next) {
@@ -273,7 +291,8 @@ function ensureAuthorized(req, res, next) {
 	console.log('bearerHeader HERE-8'+bearerHeader);
     if (typeof bearerHeader !== 'undefined') {
         var bearer = bearerHeader.split(" ");
-        bearerToken = bearer[1];
+        //console.log('bearerHeader HERE-8'+bearerHeader);
+		bearerToken = bearer[1];
         req.token = bearerToken;
         next();
     } else {
@@ -281,9 +300,21 @@ function ensureAuthorized(req, res, next) {
     }
 }
 
+app.set("view options", {layout: false});
+app.use(express.static(__dirname + '/angular'));
+
+app.get('/', function(req, res) {
+
+    res.render('Index.html');
+});
+
 process.on('uncaughtException', function(err) {
     console.log(err);
 });
+
+
+
+
 
 // Start Server
 app.listen(port, function () {
