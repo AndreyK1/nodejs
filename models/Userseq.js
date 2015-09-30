@@ -12,8 +12,16 @@ var User = sequelize.define('users', {
 }, {
     instanceMethods: {
         retrieveAll: function(onSuccess, onError) {
-            User.findAll({}, {raw: true})
-                .success(onSuccess).error(onError);
+            //User.findAll({}, {raw: true})
+			User.findAll({})
+                //.success(onSuccess).error(onError);
+				.then(function(user){
+                    onSuccess(user)
+                    console.log('findAll sssssssssssss');
+                }).catch(function(e) {
+                    onError()
+                    console.log(" findAll failederewrewrew !");
+                });
         },
         retrieveById: function(user_id, onSuccess, onError) {
             //User.find({where: {id: user_id, email: 'eeeee2'}})

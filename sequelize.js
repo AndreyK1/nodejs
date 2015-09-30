@@ -131,7 +131,34 @@ app.get('/getById/:user_id', function(req, res) {
 	GetUser(user,req,res);
 });
 
+//http://localhost:3001/AllUsers
+app.get('/AllUsers', function(req, res) {
+	
+	//вытаскиваем пользователя
+    var user = User.build();
+	//	GetUser(user,req,res,);	
+    user.retrieveAll(function(users) {
+				if (users) {
+						//res.json(users);
+					res.json({
+						type: true,
+						data: users
+					});
+						console.log('findAll users HERE-8');
+					}else {
+					res.send(401, "User not found1");
+				}
+			},
+				function(error) {
+				res.send("User not found2");
+				}
+			);	
+	
+	//user.getMessages(
 
+});
+
+//findAll
 
 //создание сообщения в базе у определ-го пользователя
 /*
