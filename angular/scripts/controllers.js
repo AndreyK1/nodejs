@@ -7,8 +7,12 @@ angular.module("angularRestfulAuth", [
 ])
     .controller('HomeCtrl',  ['$rootScope', '$scope', '$location', '$localStorage', 'Main', function($rootScope, $scope, $location, $localStorage, Main)
 {
+	//$rootScope.baseUrl = "http://localhost:3001";
+	
 	//alert('here');
 		//$scope.user={};
+		$scope.registr=null
+		
 		$scope.CurrentUser = Main.getCurrentUser();
 		
 		$scope.signin = function() {
@@ -23,7 +27,8 @@ angular.module("angularRestfulAuth", [
                     alert(res.data)    
                 } else {
                    $localStorage.token = res.data.token;
-                    $scope.user = res.data;
+                    $scope.token =$localStorage.token;
+					$scope.user = res.data;
 					$scope.CurrentUser= res.data;
 					//$rootScope.user =  $scope.user;
 					//$scope.user = JSON.parse(res.data);
@@ -37,7 +42,7 @@ angular.module("angularRestfulAuth", [
             })
 			
         };
-	
+	/*
 		$scope.getme = function() {
 			//alert('getme');
            Main.me(function(res) {
@@ -50,14 +55,14 @@ angular.module("angularRestfulAuth", [
                 $rootScope.error = 'Failed to fetch details';
             })
 			
-        };
-		
+        };*/
+		/*
 		$scope.AllUsers = function() {
-			alert('AllUsers');
+			//alert('AllUsers');
            Main.AllUsers(function(res) {
 				//alert('its ok')		
 				$scope.AllUsersCol = res.data;				
-				alert($scope.AllUsersCol[0].email);
+				//alert($scope.AllUsersCol[0].email);
 				//$scope.AllUsers = JSON.parse(res.data);
 
 				//$scope.CurrentUser = Main.getCurrentUser();
@@ -66,15 +71,65 @@ angular.module("angularRestfulAuth", [
             })
 			
         };		
+		*/
+		$scope.logout = function() {
+			//alert('AllUsers');
+           Main.logout(function(res) {
+				//alert('LOGOUT')
+				$scope.token =	null;
+				//$scope.AllUsersCol = res.data;				
+				//alert($scope.AllUsersCol[0].email);
+				//$scope.AllUsers = JSON.parse(res.data);
+
+				//$scope.CurrentUser = Main.getCurrentUser();
+            }, function() {
+                $rootScope.error = 'Failed to LOGOUT';
+            })
+			
+        };		
 		
+		$scope.login = function() {
+			//alert('getme');
+			var formData = {
+                email: $scope.email,
+                password: $scope.password
+            }
+           /*Main.login(formData,function(res) {
+                $scope.myDetails = res;
+				$scope.user = res.data;
+				$scope.CurrentUser= res.data;
+				//alert('its ok')
+				//$scope.CurrentUser = Main.getCurrentUser();
+            }, function() {
+                $rootScope.error = 'Failed to fetch user';
+            })*/
+			Main.login(formData,function(res) {
+				if (res.type == false) {
+                    alert(res.data)    
+                } else {
+                   $localStorage.token = res.data.token;
+                    $scope.token =$localStorage.token;
+					$scope.user = res.data;
+					$scope.CurrentUser= res.data;
+					//$rootScope.user =  $scope.user;
+					//$scope.user = JSON.parse(res.data);
+
+					//alert('its ok')
+					//window.location = "/";  
+					//$scope.CurrentUser = Main.getCurrentUser();
+			}}, function() {
+                $rootScope.error = 'Failed to login';
+				})
+			
+        };		
 		
 		
 	
-		$scope.tokenll = $localStorage.token;
+		$scope.token = $localStorage.token;
 }])
- .factory('Main', ['$http', '$localStorage', function($http, $localStorage){
+ .factory('Main', ['$rootScope','$http', '$localStorage', function($rootScope,$http, $localStorage){
         var baseUrl = "http://localhost:3001";
-		
+		$rootScope.baseUrl = baseUrl; 
         function changeUser(user) {
             angular.extend(currentUser, user);
         }
@@ -123,6 +178,10 @@ angular.module("angularRestfulAuth", [
 			AllUsers: function(success, error) {
                 $http.get(baseUrl + '/AllUsers').success(success).error(error)
             },
+			//localhost:3001/AllUsers/5/15
+			AllUsersWithin: function(data,success, error) {
+                $http.get(baseUrl + '/AllUsers/'+data.beg_id+'/'+data.end_id).success(success).error(error)
+            },
             getCurrentUser: function(r) {
                 return currentUser;
             },			
@@ -130,6 +189,9 @@ angular.module("angularRestfulAuth", [
                 changeUser({});
                 delete $localStorage.token;
                 success();
+            },			
+            login: function(data,success,error) {
+				$http.post(baseUrl + '/login', data).success(success).error(error)
             }
         };
 		
@@ -166,17 +228,22 @@ angular.module("angularRestfulAuth", [
             controller: 'HomeCtrl'
 			//foodata: $scope.user;
         }).
-        when('/signup', {
+        /*when('/signup', {
             templateUrl: 'partials/signup.html',
             controller: 'HomeCtrl'
-        }).
+        }).*/
         when('/me', {
             templateUrl: 'partials/me.html',
-            controller: 'HomeCtrl'
+            //controller: 'HomeCtrl'
+			controller: 'MeCtrl'
         }).
 		when('/AllUsers', {
             templateUrl: 'partials/AllUsers.html',
-            controller: 'HomeCtrl'
+            controller: 'AllUsersCtrl'
+        }).
+		when('/PageUsers/:beg_id', {
+            templateUrl: 'partials/PageUsers.html',
+            controller: 'PageUsersCtrl'
         }).
         otherwise({
             redirectTo: '/'
@@ -184,15 +251,102 @@ angular.module("angularRestfulAuth", [
   
   
   }])
-  
-  
-  
-  /*
-  .controller('MeCtrl', ['$rootScope', '$scope', '$location', 'Main', function($rootScope, $scope, $location, Main) {
-	  $scope.user.token = 'shit';
+   .controller('MeCtrl', ['$rootScope', '$scope', '$location', 'Main', function($rootScope, $scope, $location, Main) {
+	  //$scope.user.token = 'shit';
+           Main.me(function(res) {
+                //$scope.myDetails = res;
+				$scope.user = res.data;
+				//$scope.CurrentUser= res.data;
+				//alert('MeCtrl '+$scope.user)
+				//$scope.CurrentUser = Main.getCurrentUser();
+            }, function() {
+                $rootScope.error = 'Failed to fetch details';
+            })	  
 
-}]);
- */
+}])
+   .controller('AllUsersCtrl', ['$rootScope', '$scope', '$location', 'Main', function($rootScope, $scope, $location, Main) {
+           Main.AllUsers(function(res) {
+				$scope.AllUsersCol = res.data;				
+            }, function() {
+                $rootScope.error = 'Failed to fetch details';
+            })	  
+
+}])
+   .controller('PageUsersCtrl', ['$rootScope', '$scope','$routeParams','$sce', '$http','$location', 'Main', function($rootScope, $scope,$routeParams,$sce,$http,$location, Main) {
+          var baseUrl = $rootScope.baseUrl
+		  $scope.sce = $sce;
+		  $scope.pageslist = '';
+		  $scope.currentPageNum = 1;
+		  $scope.PageNum = 1;
+		  $scope.pageSize = 3;
+		  $scope.numUssers =0;
+		  
+		  if($routeParams.beg_id)
+		  $scope.currentPageNum =  $routeParams.beg_id;
+		  
+		  
+		  $scope.GetUsers = function(beg_id,end_id){
+			  var dat={
+				  beg_id:beg_id,
+				  end_id:end_id
+			  }
+			  Main.AllUsersWithin(dat,function(res) {
+					$scope.UsersOnPage = res.data;
+					//alert($scope.UsersOnPage);					
+				}, function() {
+					$rootScope.error = 'Failed to fetch UsersOnPage';
+				}
+			  )
+		  }
+		  
+		  //GetUsers(1,$scope.pageSize+1);
+		  $scope.GetUsers($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.currentPageNum*$scope.pageSize+1 )
+		  
+		  $http.get(baseUrl + '/numUssers').success(function(res){
+			  	if (res.type == false) {
+                    alert(res.data)    
+                } else {
+                   $scope.numUssers = res.data;
+				   $scope.PageNum = Math.round($scope.numUssers/$scope.pageSize);
+				   
+				   GetPagesRow();
+				}	  
+		  }).error(function() {
+                $rootScope.error = 'Failed to numUssers';
+				}	  
+		  )
+		  
+		  /*
+		  $scope.ChangePage = function(beg_id,end_id){
+			  alert('beg_id-'+beg_id+ " end_id-"+end_id);
+		  }*/
+		  
+		  
+		  $scope.pages=[];
+		  function GetPagesRow(){//рисуем страницы
+				alert($scope.pages); 			  
+			  for(var i=1; i< $scope.PageNum+1;i++){
+				  
+				  $scope.pages.push({num : i//, 
+									//beg : i*$scope.pageSize-$scope.pageSize+1, 
+									//end : i*$scope.pageSize+1	
+									})
+				  //$scope.pageslist += " "+i.toString();
+					//$scope.pageslist += "<span ng-click=\"ChangePage("+i+")\"  > "+i+" </span>";
+				 //<p ng-bind-html="sce.trustAsHtml(pageslist)"></p> 
+			  }
+			alert($scope.pages);
+		  }		  
+		  
+		  //GetPagesRow();
+		  
+		  /* Main.AllUsers(function(res) {
+				$scope.AllUsersCol = res.data;				
+            }, function() {
+                $rootScope.error = 'Failed to fetch details';
+            })	*/  
+
+}])
 
  
  

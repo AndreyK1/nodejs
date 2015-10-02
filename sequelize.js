@@ -133,8 +133,7 @@ app.get('/getById/:user_id', function(req, res) {
 
 //http://localhost:3001/AllUsers
 app.get('/AllUsers', function(req, res) {
-	
-	//вытаскиваем пользователя
+	//вытаскиваем пользователей
     var user = User.build();
 	//	GetUser(user,req,res,);	
     user.retrieveAll(function(users) {
@@ -153,12 +152,51 @@ app.get('/AllUsers', function(req, res) {
 				res.send("User not found2");
 				}
 			);	
-	
-	//user.getMessages(
-
 });
 
-//findAll
+//http://localhost:3001/AllUsers/5/15
+app.get('/AllUsers/:beg_id/:end_id', function(req, res) {
+	//вытаскиваем пользователей
+    var user = User.build();
+	//	GetUser(user,req,res,);	
+    user.retrieveUsersWithin(req.params,function(users) {
+				if (users) {
+						//res.json(users);
+						//console.log(users);
+					res.json({
+						type: true,
+						data: users
+					});
+						console.log('findAll users HERE-8');
+					}else {
+					res.send(401, "User not found1");
+				}
+			},
+				function(error) {
+				res.send("User not found2");
+				}
+			);	
+});
+//возвращает кол-во пользователей для пэйджинга
+app.get('/numUssers', function(req, res) {
+    User.count().then(function(userscol){
+				if (userscol) {
+						//res.json(users);
+						console.log(userscol);
+					res.json({
+						type: true,
+						data: userscol
+					});
+						console.log('userscol users HERE-12');
+					}else {
+					res.send(401, "userscol not found1");
+				}
+
+                }).catch(function(error) {
+                    res.send("User not found2");
+                });
+});
+
 
 //создание сообщения в базе у определ-го пользователя
 /*
@@ -277,7 +315,7 @@ app.post('/authenticate', function(req, res) {
 */
 
 app.get('/me', ensureAuthorized, function(req, res) {
-	
+   
    // User.findOne({token: req.token}, function(err, user) {
 	   User.find({where: {token: req.token}})
 	   .then(function(user){
@@ -295,21 +333,35 @@ app.get('/me', ensureAuthorized, function(req, res) {
                     console.log('Error HERE-6');
 					//console.log("Project update failederewrewrew !");
                 });
-	   /*, function(err, user) {
-        if (err) {
-			console.log('Error HERE-6');
-            res.json({
-                type: false,
-                data: "Error occured: " + err
-            });
-        } else {
-			console.log('Ok HERE-7');
-            res.json({
-                type: true,
-                data: user
-            });
-        }
-    });*/
+
+});
+
+app.post('/login', function(req, res) {
+  
+    //console.log(req.body.email);
+    var email = req.body.email
+	var password = req.body.password
+	
+	//проверяем есть ли такой пользователь
+		console.log('login HERE-9');
+  // User.findOne({token: req.token}, function(err, user) {
+	   User.find({where: {email: email,password: password}})
+	   .then(function(user){
+					res.json({
+						type: true,
+						data: user
+					});
+                    console.log('Ok HERE-10'+user.email);
+					//console.log('sssssssssssss');
+                }).catch(function(e) {
+                    res.json({
+						type: false,
+						data: "User not found Error occured: " + err
+					});
+                    console.log('Error HERE-11');
+					//console.log("Project update failederewrewrew !");
+                });
+
 });
 
 function ensureAuthorized(req, res, next) {

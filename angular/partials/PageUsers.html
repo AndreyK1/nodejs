@@ -1,0 +1,16 @@
+PageUsers.html numUssers - {{numUssers}}
+
+<br />
+<span ng-repeat="page in pages">
+	<!--<span ng-click="GetUsers(page.beg,page.end)">{{page.num}}</span><!--page.beg,beg.end-->
+	<a  href="#PageUsers/{{page.num}}"> {{page.num}}</a>
+</span>
+
+<div ng-repeat="user in UsersOnPage">
+	<div>id - {{user.id}}</div>
+	<div>emailA - {{user.email}}</div>
+	<div>passwordA - {{user.password}}</div>
+	<div>tokenA - {{user.token}}</div>
+	<hr />
+</div>
+

@@ -1,3 +1,4 @@
+//http://sequelize.readthedocs.org/en/latest/docs/querying/
 var Sequelize = require('sequelize');
 var nconf = require('nconf');
 nconf.env().file({ file: 'config.json' });
@@ -54,6 +55,23 @@ var User = sequelize.define('users', {
                 .then(function(user){
                     onSuccess(user)
                     console.log('getByEmail-sucsess');
+                }).catch(function(e) {
+                    onError()
+                    console.log("Project update failederewrewrew !");
+                });
+        },
+		retrieveUsersWithin: function(params, onSuccess, onError) {
+            //User.find({where: {id: user_id, email: 'eeeee2'}})
+            User.findAll({where: {
+					//id: params.beg_id  
+						id: {
+								  $lt: params.end_id,
+								  $gt: params.beg_id
+							  }
+					}})
+                .then(function(user){
+                    onSuccess(user)
+                    console.log('retrieveUsersWithin-sucsess');
                 }).catch(function(e) {
                     onError()
                     console.log("Project update failederewrewrew !");
