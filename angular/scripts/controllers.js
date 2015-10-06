@@ -193,6 +193,24 @@ angular.module("angularRestfulAuth", [
             login: function(data,success,error) {
 				$http.post(baseUrl + '/login', data).success(success).error(error)
             }
+			
+			,
+			//saveFile: function (data,file,url) {
+				saveFile: function (data) {
+				//var url = conf.apiUrl;
+				//var fd = new FormData();
+				//fd.append('file', file);
+				//return $http({
+					$http({
+					method: 'POST',
+					url: baseUrl + '/SaveFile',
+					transformRequest: angular.identity,
+					data: data,
+					//data: fd,
+					headers: {'Content-Type': undefined}
+				});
+			}
+			
         };
 		
 		
@@ -245,6 +263,14 @@ angular.module("angularRestfulAuth", [
             templateUrl: 'partials/PageUsers.html',
             controller: 'PageUsersCtrl'
         }).
+		when('/SaveFile', {
+            templateUrl: 'partials/saveFile.html',
+            controller: 'SaveFile'
+          }).
+		when('/watch_examlpe', {
+            templateUrl: 'partials/watch_ex.html',
+            controller: 'watch_examlpe'      
+		}).
         otherwise({
             redirectTo: '/'
         });
@@ -273,7 +299,8 @@ angular.module("angularRestfulAuth", [
 
 }])
    .controller('PageUsersCtrl', ['$rootScope', '$scope','$routeParams','$sce', '$http','$location', 'Main', function($rootScope, $scope,$routeParams,$sce,$http,$location, Main) {
-          var baseUrl = $rootScope.baseUrl
+         // alert('hhhhh');
+		  var baseUrl = $rootScope.baseUrl
 		  $scope.sce = $sce;
 		  $scope.pageslist = '';
 		  $scope.currentPageNum = 1;
@@ -304,7 +331,7 @@ angular.module("angularRestfulAuth", [
 		  
 		  $http.get(baseUrl + '/numUssers').success(function(res){
 			  	if (res.type == false) {
-                    alert(res.data)    
+                   // alert(res.data)    
                 } else {
                    $scope.numUssers = res.data;
 				   $scope.PageNum = Math.round($scope.numUssers/$scope.pageSize);
@@ -316,15 +343,9 @@ angular.module("angularRestfulAuth", [
 				}	  
 		  )
 		  
-		  /*
-		  $scope.ChangePage = function(beg_id,end_id){
-			  alert('beg_id-'+beg_id+ " end_id-"+end_id);
-		  }*/
-		  
-		  
-		  $scope.pages=[];
+		$scope.pages=[];
 		  function GetPagesRow(){//рисуем страницы
-				alert($scope.pages); 			  
+				//alert($scope.pages); 			  
 			  for(var i=1; i< $scope.PageNum+1;i++){
 				  
 				  $scope.pages.push({num : i//, 
@@ -335,16 +356,156 @@ angular.module("angularRestfulAuth", [
 					//$scope.pageslist += "<span ng-click=\"ChangePage("+i+")\"  > "+i+" </span>";
 				 //<p ng-bind-html="sce.trustAsHtml(pageslist)"></p> 
 			  }
-			alert($scope.pages);
+			//alert($scope.pages);
 		  }		  
 		  
-		  //GetPagesRow();
-		  
-		  /* Main.AllUsers(function(res) {
-				$scope.AllUsersCol = res.data;				
-            }, function() {
-                $rootScope.error = 'Failed to fetch details';
-            })	*/  
+}])
+   .controller('SaveFile', ['$rootScope', '$scope', '$http', '$location', 'Main', function($rootScope, $scope, $http, $location, Main) {
+           var baseUrl = "http://localhost:3001";
+		   var url = "http://localhost:3001";
+		  // var url = $rootScope.baseUrl
+		   //var url = conf.apiUrl;
+			/*
+			saveFile: function (file) {
+				var url = conf.apiUrl;
+				var fd = new FormData();
+				fd.append('file', file);
+				return $http({
+					method: 'POST',
+					url: url,
+					transformRequest: angular.identity,
+					data: fd,
+					headers: {'Content-Type': undefined}
+				});
+			}*/
+			
+			function ss(data) {
+				var baseUrl = "http://localhost:3001";
+				//var url = conf.apiUrl;
+				//var fd = new FormData();
+				//fd.append('file', file);
+			  // function(data, success, error) {
+              
+
+			 // $http.post(baseUrl + '/signin', data).success(success).error(error)
+			 //$http.post(baseUrl + '/SaveFile', data)
+				
+				
+				
+				 $http({
+					method: 'POST',
+					url: baseUrl + '/SaveFile',
+					transformRequest: angular.identity,
+					data: data,
+					//data: fd,
+					headers: {'Content-Type': undefined}
+				});
+			}
+			
+
+			//alert('signin1');
+			
+			$scope.savefile = function() {
+				//alert('signin');
+				
+				
+				
+				var fileInput = document.querySelector("#myfiles");
+				var files = fileInput.files;
+				//alert(fileInput)
+				var file = files[0];
+				alert(file.name)
+				//file = {"dsfdsf":"sadsadsattt6666"}
+				var ff = JSON.stringify(file)
+				alert(ff)
+
+					//password: $scope.password
+				 var fd = new FormData();
+				fd.append('file', file,'chris.doc');
+				 
+				var data = {
+					dddd: 'fdfdsffdsfgfdgfdg',
+					//file: file,
+					email: 'fdgfdgfdg'
+					//password: $scope.password
+				}					
+				//Main.saveFile(data);
+				ss(fd);
+			}
+
+			
+			/*
+			//еще один способ отправки
+			//<input type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)"/>
+			$scope.uploadFile = function(files) {
+					var fd = new FormData();
+					//Take the first selected file
+					fd.append("file", files[0]);
+
+					$http.post(baseUrl + '/SaveFile', fd, {
+						withCredentials: true,
+						headers: {'Content-Type': undefined },
+						transformRequest: angular.identity
+					})
+
+				};*/
+}])
+   .controller('watch_examlpe', ['$rootScope', '$scope','$sce', '$document', '$location', 'Main', function($rootScope, $scope,$sce,$document,$location, Main) {
+		// good example in directive
+		//https://thinkster.io/egghead/angular-element
+		
+		//  var target = angular.element('#appBusyIndicator');
+		//var target = angular.element('appBusyIndicator');
+		//var myEl = angular.element( document.querySelector( '#some-id' ) );
+		//var myEl = $document.find('#some-id'));
+		//var myElement = angular.element($document[0].querySelector('#MyID'))
+		
+		
+		/*1 прим*/
+		$scope.lss=0;
+			$scope.$watch('lss'
+			, function(val) {
+			   alert(val);
+			});		
+		
+		
+
+		/*2 прим*/
+			$scope.$watch(function () {
+			   //return angular.element('#wrvv-1').val()
+			   return angular.element( document.querySelector( '#wrvv-1' )).attr('class');
+			   //angular.element($document.querySelector('#wr-1'))
+			}, function(val) {
+			   alert(val);
+			});		
+		
+		$scope.sce = $sce;
+		$scope.list ='';
+		var n=2;
+		for(var i=0; i<n; i++){
+			
+			$scope.list +="<input type='text' id='w-"+i+"' value='"+i+"'  />";
+
+			//$scope.pageslist += " <span  ng-click=\"ChangePage("+i+")\"  > "+i+" </span> ";
+			//<p ng-bind-html="sce.trustAsHtml(pageslist)"></p> 			
+		}
+		/*
+			$scope.$watch(function () {
+			   return angular.element( document.querySelector( '#wr-1' ));
+			   //angular.element($document.querySelector('#wr-1'))
+			}, function(val) {
+			   alert(val);
+			});*/
+		
+		/*$scope.$watch(function () {
+			   //return document.body.innerHTML;
+			   //return angular.element( document.querySelector( '#for-Watch' ));
+			   //return angular.element( document.querySelector( '#for-Watch' ));
+			   return angular.element($document[0].querySelector('#for-Watch'))
+			}, function(val) {
+			   alert(val);
+			   //TODO: write code here, slit wrists, etc. etc.
+			});*/
 
 }])
 

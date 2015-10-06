@@ -1,4 +1,5 @@
 var Sequelize = require('sequelize')
+var fs = require('fs');
 var nconf = require('nconf');
 nconf.env().file({ file: 'config.json' });
 //var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
@@ -378,6 +379,83 @@ function ensureAuthorized(req, res, next) {
         res.send(403);
     }
 }
+
+var busboy = require('connect-busboy');
+app.use(busboy()); 
+app.post('/SaveFile', function(req, res) {
+	    var fstream;
+    req.pipe(req.busboy);
+    req.busboy.on('file', function (fieldname, file, filename) {
+        console.log("Uploading: " + filename); 
+        fstream = fs.createWriteStream(__dirname + '/uploads/' + filename);
+        file.pipe(fstream);
+       fstream.on('close', function () {
+			res.redirect('back');
+        });
+    });
+	
+	
+	
+	
+	
+	 // console.log(req.files);
+	 //var filename = JSON.stringify(req.body);
+	// console.log(req.files);
+	//var files = req.files
+	//var email = req.body.email;
+    
+	/*
+	req.form.complete(function(err, fields, files) {
+    if (err) { next(err); }
+    else {
+            console.log(fields);
+            console.log('---------------');
+            console.log(files);
+            res.redirect(req.url);
+        }
+    });*/
+	/*
+	    fs.writeFileSync("test15.doc",req.body,"binary",function(err){
+            if(err) throw err;
+            res.send("OK")
+        })*/
+	//	fs.createWriteStream('test19.doc').pipe(req.body);
+	
+    //console.log('file-'+files.toString())	
+		/*
+		fs.readFile(file, function (err, data) {
+		  // ...
+		  var newPath = __dirname + "/uploads/uploadedFileName";
+		  fs.writeFile(newPath, data, function (err) {
+			res.redirect("back");
+		  });
+		});
+	*/
+
+
+	//console.log('email-'+email)
+	
+	/*var user_id = req.body.user_id
+    console.log(text+"---"+user_id)
+	//вытаскиваем пользователя
+    var user = User.build();
+	//	GetUser(user,req,res,);	
+	
+		    user.retrieveById(user_id, function(users) {
+			if (users) {
+					//res.json(users);
+					var message = Message.build({ text: text}).save().then(function(message){
+                    users.addMessage(message); console.log('sssFFFFFssssssssss');});				
+				}else {
+				res.send(401, "User not found1");
+			}
+			},
+				function(error) {
+				res.send("User not found2");
+				}
+			);	*/
+});
+
 
 app.set("view options", {layout: false});
 app.use(express.static(__dirname + '/angular'));

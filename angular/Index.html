@@ -5,14 +5,15 @@
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular-route.js"></script>	
 	<script src="https://cdn.jsdelivr.net/ngstorage/0.3.6/ngStorage.min.js"></script>
-	<script src="scripts/controllers.js"></script>
+	
+	<script src="js/jquery-2.1.4.min.js"></script>	
+	<script src="js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	
+	<script src="scripts/controllers.js"></script>	
 	
 	<title>Restful Authentication with NodeJS & AngularJS</title>
 	
-	<!-- Bootstrap core CSS 
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/lib/loading-bar.css">-->
-
     <style>
         body {
             padding-top: 10px;
@@ -21,9 +22,68 @@
         }
     </style>
 </head>
-<body ng-app="angularRestfulAuth">
+<body ng-app="angularRestfulAuth" ng-controller="HomeCtrl">
+	<div class="container"  >
+		<div class="row">
+			<div class="col-md-12">
+				<nav class="navbar navbar-default">
+					<div class="container-fluid">
+						    <div class="navbar-header">
+							  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							  </button>
+							  <a class="navbar-brand" href="#/PageUsers/1">Main</a>
+							</div>
+							
+							 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+								<ul class="nav navbar-nav">
+									<li><a href="#">Link</a></li>
+									<li class="dropdown">
+									  <a  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+											Dropdown <span class="caret"></span>
+										</a>
+									  <ul class="dropdown-menu">
+										<li><a href="#">Action</a></li>
+										<li><a href="#">Another action</a></li>
+										<li><a href="#">Something else here</a></li>
+									  </ul>
+									</li>
+								</ul>
+								
+								
+								<form ng-hide="token || registr" class="navbar-form navbar-right" role="search">
+									<div class="form-group">
+									  <input type="text" class="form-control" placeholder="Search">
+									</div>
+									<button type="submit" class="btn btn-default">Войти</button>
+									<button class="btn btn-default">Регистрация</button>
+								</form>
+								
+								<div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
+									<ul class="nav navbar-nav">
+										<li><a >email - {{CurrentUser.email}}</a></li>
+										<li><a >pass - {{CurrentUser.password}}</a></li>
+										<li><a ng-click="getme()"  ng-href="#/me" >Show Me</a></li>
+									</ul>	
+								</div>	
+							</div><!-- /.navbar-collapse -->
+					</div><!-- /.container-fluid -->
+				</nav>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="container" ng-view="">
 
-		<div role="navigation" ng-controller="HomeCtrl">
+				</div>
+			</div>				
+		</div>			
+	</div>
+
+		<!--<div ng-controller="HomeCtrl">-->
 			<!-- текущий пользователь (из токена)-->
 			<div ng-show="token" style="border:1px solid green;">
 				Ваши данные:
@@ -55,19 +115,18 @@
 
 		   <!--<div ng-hide="token"><span ng-click="AllUsers()">AllUsers</span></div>-->
 
-           <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+
                     <li><a ng-href="#/">-Home</a></li>
                     <!--<li ><a ng-click="getme()"  ng-href="#/me">-Me</a></li>-->
 					<li ><a  ng-href="#/AllUsers">AllUsers</a></li>
 					<li ><a  ng-href="#/PageUsers/1">PageUsers</a></li>
-
+					<li ><a  ng-href="#/SaveFile">savefile</a></li>
+					<li ><a  ng-href="#/watch_examlpe">watch_examlpe</a></li>
+					
                     
-                </ul>
-           </div>
-		<div class="container" ng-view="">
 
-		</div> <!-- /container -->			
+           <!-- </div>-->
+ <!-- /container -->			
 						   
 						  <!-- <div>
 								<div>email - {{user.email}}</div>
