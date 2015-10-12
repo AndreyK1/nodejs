@@ -13,6 +13,8 @@ angular.module("angularRestfulAuth", [
 		//$scope.user={};
 		$scope.registr=null
 		
+		$rootScope.PathToNode = '../';
+		
 		$scope.CurrentUser = Main.getCurrentUser();
 		
 		$scope.signin = function() {
@@ -263,10 +265,10 @@ angular.module("angularRestfulAuth", [
             templateUrl: 'partials/PageUsers.html',
             controller: 'PageUsersCtrl'
         }).
-		when('/SaveFile', {
+		/*when('/SaveFile', {
             templateUrl: 'partials/saveFile.html',
             controller: 'SaveFile'
-          }).
+          }).*/
 		when('/watch_examlpe', {
             templateUrl: 'partials/watch_ex.html',
             controller: 'watch_examlpe'      
@@ -277,7 +279,9 @@ angular.module("angularRestfulAuth", [
   
   
   }])
-   .controller('MeCtrl', ['$rootScope', '$scope', '$location', 'Main', function($rootScope, $scope, $location, Main) {
+   .controller('MeCtrl', ['$rootScope', '$scope','$http', '$location', 'Main', function($rootScope, $scope,$http, $location, Main) {
+	  var baseUrl = $rootScope.baseUrl
+	 // var baseUrl = "http://localhost:3001";
 	  //$scope.user.token = 'shit';
            Main.me(function(res) {
                 //$scope.myDetails = res;
@@ -287,7 +291,55 @@ angular.module("angularRestfulAuth", [
 				//$scope.CurrentUser = Main.getCurrentUser();
             }, function() {
                 $rootScope.error = 'Failed to fetch details';
-            })	  
+            })
+
+			$scope.uploadFile = function(files) {
+					var fd = new FormData();
+						/*var fd = {
+							email: "uytuyt",
+							password: "ytuytuyt"
+						}*/
+					//Take the first selected file
+					//fd.append("file", files[0]);
+					fd.append("user_id", $scope.user.id);
+					fd.append("file", files[0]);
+
+					$http.post(baseUrl + '/SaveFile', fd, {
+						withCredentials: true,
+						headers: {'Content-Type': undefined },
+						transformRequest: angular.identity
+					})
+
+				}
+			//добавление фото
+/*			function ss(data) {
+				var baseUrl = "http://localhost:3001";
+				 $http({
+					method: 'POST',
+					url: baseUrl + '/SaveFile',
+					transformRequest: angular.identity,
+					data: data,
+					//data: fd,
+					headers: {'Content-Type': undefined}
+				});
+			}
+			
+			$scope.savefile = function() {
+				var fileInput = document.querySelector("#myfiles");
+				var files = fileInput.files;
+				var file = files[0];
+				 var fd = new FormData();
+				//fd.append('file', file,'chris.doc');
+				 fd.append('file', file);
+				var data = {
+					dddd: 'fdfdsffdsfgfdgfdg',
+					//file: file,
+					email: 'fdgfdgfdg'
+					//password: $scope.password
+				}					
+				//Main.saveFile(data);
+				ss(fd);
+			}	*/		
 
 }])
    .controller('AllUsersCtrl', ['$rootScope', '$scope', '$location', 'Main', function($rootScope, $scope, $location, Main) {
@@ -301,11 +353,13 @@ angular.module("angularRestfulAuth", [
    .controller('PageUsersCtrl', ['$rootScope', '$scope','$routeParams','$sce', '$http','$location', 'Main', function($rootScope, $scope,$routeParams,$sce,$http,$location, Main) {
          // alert('hhhhh');
 		  var baseUrl = $rootScope.baseUrl
+		  var PathToNode = $rootScope.PathToNode
+		  
 		  $scope.sce = $sce;
 		  $scope.pageslist = '';
 		  $scope.currentPageNum = 1;
 		  $scope.PageNum = 1;
-		  $scope.pageSize = 3;
+		  $scope.pageSize = 12;
 		  $scope.numUssers =0;
 		  
 		  if($routeParams.beg_id)
@@ -319,11 +373,39 @@ angular.module("angularRestfulAuth", [
 			  }
 			  Main.AllUsersWithin(dat,function(res) {
 					$scope.UsersOnPage = res.data;
+					fotoCheck();
+							
+							//var target = angular.element('appBusyIndicator');
+							//var myEl = angular.element( document.querySelector( '#some-id' ) );
+							//var myEl = $document.find('#some-id'));
+							//var myElement = angular.element($document[0].querySelector('#MyID'))
+								/*
+								$scope.$watch(function () {
+								   //return angular.element('#wrvv-1').val()
+								   //return angular.elements( document.querySelector('.popo'))[2].attr('title');
+								   return $document.find('.popo')[0];
+								   //angular.element($document.querySelector('#wr-1'))
+								}, function(val) {
+								   alert(val);
+								});	
+**/
+					
 					//alert($scope.UsersOnPage);					
 				}, function() {
 					$rootScope.error = 'Failed to fetch UsersOnPage';
 				}
 			  )
+		  }
+		  //проверяем фотки, если нету, товставляем no foto
+		  function fotoCheck(){
+			  for(var i=0; i<$scope.UsersOnPage.length;i++){
+				  if($scope.UsersOnPage[i].foto ==null){
+					  //alert('null-'+$scope.UsersOnPage[i].email)
+					  $scope.UsersOnPage[i].foto = 'img/no.jpg'
+				  }else{
+					  $scope.UsersOnPage[i].foto = 'foto/'+$scope.UsersOnPage[i].foto;
+				  }
+			  }
 		  }
 		  
 		  //GetUsers(1,$scope.pageSize+1);
@@ -334,7 +416,7 @@ angular.module("angularRestfulAuth", [
                    // alert(res.data)    
                 } else {
                    $scope.numUssers = res.data;
-				   $scope.PageNum = Math.round($scope.numUssers/$scope.pageSize);
+				   $scope.PageNum = Math.ceil($scope.numUssers/$scope.pageSize);
 				   
 				   GetPagesRow();
 				}	  
@@ -360,7 +442,7 @@ angular.module("angularRestfulAuth", [
 		  }		  
 		  
 }])
-   .controller('SaveFile', ['$rootScope', '$scope', '$http', '$location', 'Main', function($rootScope, $scope, $http, $location, Main) {
+ /*  .controller('SaveFile', ['$rootScope', '$scope', '$http', '$location', 'Main', function($rootScope, $scope, $http, $location, Main) {
            var baseUrl = "http://localhost:3001";
 		   var url = "http://localhost:3001";
 		  // var url = $rootScope.baseUrl
@@ -379,7 +461,7 @@ angular.module("angularRestfulAuth", [
 				});
 			}*/
 			
-			function ss(data) {
+/*			function ss(data) {
 				var baseUrl = "http://localhost:3001";
 				//var url = conf.apiUrl;
 				//var fd = new FormData();
@@ -449,7 +531,7 @@ angular.module("angularRestfulAuth", [
 					})
 
 				};*/
-}])
+//}])
    .controller('watch_examlpe', ['$rootScope', '$scope','$sce', '$document', '$location', 'Main', function($rootScope, $scope,$sce,$document,$location, Main) {
 		// good example in directive
 		//https://thinkster.io/egghead/angular-element

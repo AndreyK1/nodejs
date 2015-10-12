@@ -10,9 +10,18 @@
 	<script src="js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	
+	<link rel="stylesheet" href="css/style.css">
 	<script src="scripts/controllers.js"></script>	
 	
 	<title>Restful Authentication with NodeJS & AngularJS</title>
+	
+	<script>
+		$(document).ready(function(){
+			$('[data-toggle="popover"]').popover(); 
+			alert('ghjghj');
+		});
+	</script>
+	
 	
     <style>
         body {
@@ -22,6 +31,7 @@
         }
     </style>
 </head>
+<!--<span data-toggle="popover" data-trigger="hover" title="Popover Header" data-content="Some content inside the popover" >gfdgfd</span>-->
 <body ng-app="angularRestfulAuth" ng-controller="HomeCtrl">
 	<div class="container"  >
 		<div class="row">
@@ -56,17 +66,32 @@
 								
 								<form ng-hide="token || registr" class="navbar-form navbar-right" role="search">
 									<div class="form-group">
-									  <input type="text" class="form-control" placeholder="Search">
+									  <input type="text" class="form-control" placeholder="email" name='email' ng-model='email'>
+									  <input type='text' class="form-control" placeholder="password" name='password' ng-model='password' />
+										<a  class="btn btn-default" ng-click="login()">Войти</a>
+										<a  class="btn btn-default btn-xs btn-warning" ng-click="registr=1">Регистрация</a>
 									</div>
-									<button type="submit" class="btn btn-default">Войти</button>
-									<button class="btn btn-default">Регистрация</button>
+								</form>
+								<form ng-hide="token || !registr" class="navbar-form navbar-right" role="search">
+									<div class="form-group">
+									  <input type="text" class="form-control" placeholder="email" name='email' ng-model='email'>
+									  <input type='text' class="form-control" placeholder="password" name='password' ng-model='password' />
+										<a  class="btn btn-default" ng-click="signin()">Зарегистрироваться</a>
+										<a  class="btn btn-default btn-xs btn-warning" ng-click="registr=null">Вход</a>
+									</div>
 								</form>
 								
 								<div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
-									<ul class="nav navbar-nav">
-										<li><a >email - {{CurrentUser.email}}</a></li>
-										<li><a >pass - {{CurrentUser.password}}</a></li>
-										<li><a ng-click="getme()"  ng-href="#/me" >Show Me</a></li>
+									<ul ng-show="token" class="nav navbar-nav">
+										<li class="dropdown">
+										  <a  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+												{{CurrentUser.email}} <span class="caret"></span>
+											</a>
+										  <ul class="dropdown-menu">
+											<li><a href="#/me">Профиль</a></li>
+											<li><a href="#" ng-click="logout()" >Выход</a></li>
+										  </ul>
+										</li>
 									</ul>	
 								</div>	
 							</div><!-- /.navbar-collapse -->
@@ -76,7 +101,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<div class="container" ng-view="">
+				<div ng-view="">
 
 				</div>
 			</div>				
@@ -85,7 +110,7 @@
 
 		<!--<div ng-controller="HomeCtrl">-->
 			<!-- текущий пользователь (из токена)-->
-			<div ng-show="token" style="border:1px solid green;">
+			<!--<div ng-show="token" style="border:1px solid green;">
 				Ваши данные:
 				<span >email - {{CurrentUser.email}}</span><br />
 				<span >pass - {{CurrentUser.password}}</span><br />
@@ -99,9 +124,7 @@
 			   pass<input type='text' name='password' ng-model='password' />
 			   <div ng-hide="token"><span ng-click="login()">login</span></div>
 			 <span ng-click="registr=1">регистрация</span><br />  
-				
-
-				
+	
 			</div>
 			<div ng-hide="token || !registr" style="border:1px solid green;">
 				<b>Регистрация</b><br />
@@ -112,7 +135,7 @@
 
 				
 			</div>			
-
+-->
 		   <!--<div ng-hide="token"><span ng-click="AllUsers()">AllUsers</span></div>-->
 
 

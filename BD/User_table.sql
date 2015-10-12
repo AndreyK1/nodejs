@@ -2,7 +2,7 @@
 
 -- DROP TABLE users;
 
-CREATE TABLE users
+REATE TABLE users
 (
   id integer NOT NULL DEFAULT nextval('"Users_id_seq"'::regclass),
   email character varying(255),
@@ -10,6 +10,7 @@ CREATE TABLE users
   "createdAt" timestamp with time zone NOT NULL,
   "updatedAt" timestamp with time zone NOT NULL,
   token character varying(255),
+  foto character varying(100),
   CONSTRAINT "Users_pkey" PRIMARY KEY (id)
 )
 WITH (
@@ -17,6 +18,7 @@ WITH (
 );
 ALTER TABLE users
   OWNER TO postgreadmin;
+
 
   
   

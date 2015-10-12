@@ -5,6 +5,7 @@ nconf.env().file({ file: 'config.json' });
 //var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
 //var sequelize = new Sequelize("postgres://postgreadmin:7654321@192.168.123.159:5432/AndeyBD");
 var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
+
 /*
 var sequelize = new Sequelize(
     "AndeyBD",
@@ -382,17 +383,55 @@ function ensureAuthorized(req, res, next) {
 
 var busboy = require('connect-busboy');
 app.use(busboy()); 
-app.post('/SaveFile', function(req, res) {
+
+var pathFoto = '/angular/foto/';
+
+app.post('/SaveFile',ensureAuthorized, function(req, res) {
 	    var fstream;
     req.pipe(req.busboy);
-    req.busboy.on('file', function (fieldname, file, filename) {
-        console.log("Uploading: " + filename); 
-        fstream = fs.createWriteStream(__dirname + '/uploads/' + filename);
-        file.pipe(fstream);
-       fstream.on('close', function () {
-			res.redirect('back');
-        });
-    });
+	
+		var id_user = '';
+		
+		req.busboy.on('field', function(fieldname, val) {
+			console.log(fieldname+' - ' + val)
+			id_user = val;
+		})  
+	
+		req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+			console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
+			var email = JSON.stringify(req.body)
+			//var ff = JSON.stringify(file)
+			//console.log('email ' + email)
+			//console.log("Uploading: " + filename); 
+			var fn = filename.split('.')[1];
+			fstream = fs.createWriteStream(__dirname + pathFoto + id_user+'.'+fn);
+			/*
+			image/bmp
+			image/gif
+			image/jpeg
+			image/png
+			*/
+			
+			file.pipe(fstream);
+		   fstream.on('close', function () {
+			   //записываем изменения у пользователя
+			   	   //User.find({where: {id: id_user}})
+				   User.update({foto: id_user+'.'+fn},{where: {id: id_user}})
+					.then(function(user){
+					
+					/*res.json({
+						type: true,
+						data: user*/
+						console.log('Ok HERE-12');	
+					});
+                    
+					//console.log('sssssssssssss');
+
+				res.redirect('back');
+			});
+		});
+	
+
 	
 	
 	

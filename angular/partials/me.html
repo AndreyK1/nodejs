@@ -1,8 +1,35 @@
-me.html
+me1.html
+
+<form>
+	<div class="form-group">
+	  <label>email</label>
+	  <input type="text" disabled class="form-control" placeholder="{{user.email}}" name='email' ng-model='email'>
+	  <div>foto - {{user.foto}}</div>
+	   <div>id - {{user.id}}</div>
+	  <!--<input type='text' class="form-control" placeholder="password" name='password' ng-model='password' />
+		<a  class="btn btn-default" ng-click="signin()">Зарегистрироваться</a>
+		<a  class="btn btn-default btn-xs btn-warning" ng-click="registr=null">Вход</a>-->
+	</div>
+</form>
+<form method="post" enctype="multipart/form-data" action="/file-upload">
+<!--<input type="file" ng-model="model.file" change="upload(model)" />-->
+<label>Вставить фото</label>
+<div class="file_upload">+
+	<input  id="myfiles" type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
+</div>
+<span>сделать обработку фотки для пользака, и вывести результат добавления</span>
+
+<!---->
+<!--<a  class="btn btn-default" ng-click="savefile()">Вставить</a>
+<span ng-click="savefile()">savefile</span>-->
+</form>
+
+<!--
+
 <div>
 	<div>email1 - {{user.email}}</div>
 	<div>password - {{user.password}}</div>
 	<div>token - {{user.token}}</div>
 	<div>localStorage.token - {{token}}</div>
 	<div>user - {{user}}</div>
-</div>
+</div>-->

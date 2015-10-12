@@ -1,16 +1,24 @@
 PageUsers.html numUssers - {{numUssers}}
 
 <br />
+
+<div class="row col-md-12">
 <span ng-repeat="page in pages">
 	<!--<span ng-click="GetUsers(page.beg,page.end)">{{page.num}}</span><!--page.beg,beg.end-->
 	<a  href="#PageUsers/{{page.num}}"> {{page.num}}</a>
 </span>
-
-<div ng-repeat="user in UsersOnPage">
-	<div>id - {{user.id}}</div>
+</div>
+<!--https://code.google.com/p/resize-crop/ -->
+<div class="row">
+<div class="col-md-3" ng-repeat="user in UsersOnPage">
+<a href="#" class="img-thumbnail"  >
+	<!--<div>id - {{user.id}}</div>
 	<div>emailA - {{user.email}}</div>
 	<div>passwordA - {{user.password}}</div>
-	<div>tokenA - {{user.token}}</div>
-	<hr />
+	<div>tokenA - {{user.token}}</div>-->
+	<!--<div>foto - {{PathToNode+user.foto}}</div>-->
+	<!--<div title="{{user.id}} - {{user.email}}"  style="width;300px ; min-height:300px; background-image: url({{user.foto}});"    /><!--style="width;100px ; height:100px;"-->
+		<img class="popo" title="{{user.id}} - {{user.email}}"  width="250px" ; style="height:250px;" src="{{user.foto}}"  data-toggle="popover" data-trigger="hover" title="Popover Header" data-content="Some content inside the popover"   /><!--style="width;100px ; height:100px;"  class="img-thumbnail"-->
+</a>
 </div>
-
+</div>

@@ -9,6 +9,7 @@ var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
 var User = sequelize.define('users', {
     email: Sequelize.STRING,
     password: Sequelize.STRING,
+	foto: Sequelize.STRING,
     token: Sequelize.STRING
 }, {
     instanceMethods: {
