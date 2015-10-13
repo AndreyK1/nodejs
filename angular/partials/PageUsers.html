@@ -8,6 +8,8 @@ PageUsers.html numUssers - {{numUssers}}
 	<a  href="#PageUsers/{{page.num}}"> {{page.num}}</a>
 </span>
 </div>
+<!--https://amitgharat.wordpress.com/2013/02/03/an-approach-to-use-jquery-plugins-with-angularjs/
+http://itchief.ru/lessons/bootstrap-3/99-bootstrap-3-popovers
 <!--https://code.google.com/p/resize-crop/ -->
 <div class="row">
 <div class="col-md-3" ng-repeat="user in UsersOnPage">
@@ -18,7 +20,9 @@ PageUsers.html numUssers - {{numUssers}}
 	<div>tokenA - {{user.token}}</div>-->
 	<!--<div>foto - {{PathToNode+user.foto}}</div>-->
 	<!--<div title="{{user.id}} - {{user.email}}"  style="width;300px ; min-height:300px; background-image: url({{user.foto}});"    /><!--style="width;100px ; height:100px;"-->
-		<img class="popo" title="{{user.id}} - {{user.email}}"  width="250px" ; style="height:250px;" src="{{user.foto}}"  data-toggle="popover" data-trigger="hover" title="Popover Header" data-content="Some content inside the popover"   /><!--style="width;100px ; height:100px;"  class="img-thumbnail"-->
+		
+		<!--<img  class="popo" title="{{user.id}} - {{user.email}}"  width="250px" ; style="height:250px;" src="{{user.foto}}"  data-toggle="popover" data-trigger="hover" title="Popover Header" data-content="Some content inside the popover"   /><!--style="width;100px ; height:100px;"  class="img-thumbnail"-->
+		<img popover-el="{ title:'user id - {{user.id}}' ,content: 'user email - {{user.email}}', placement: 'right'}"  class="popo"  width="250px" ; style="height:250px;" src="{{user.foto}}"  data-toggle="popover" data-trigger="hover"    />
 </a>
 </div>
 </div>

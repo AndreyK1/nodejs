@@ -432,69 +432,44 @@ app.post('/SaveFile',ensureAuthorized, function(req, res) {
 		});
 	
 
-	
-	
-	
-	
-	
-	 // console.log(req.files);
-	 //var filename = JSON.stringify(req.body);
-	// console.log(req.files);
-	//var files = req.files
-	//var email = req.body.email;
-    
-	/*
-	req.form.complete(function(err, fields, files) {
-    if (err) { next(err); }
-    else {
-            console.log(fields);
-            console.log('---------------');
-            console.log(files);
-            res.redirect(req.url);
-        }
-    });*/
-	/*
-	    fs.writeFileSync("test15.doc",req.body,"binary",function(err){
-            if(err) throw err;
-            res.send("OK")
-        })*/
-	//	fs.createWriteStream('test19.doc').pipe(req.body);
-	
-    //console.log('file-'+files.toString())	
-		/*
-		fs.readFile(file, function (err, data) {
-		  // ...
-		  var newPath = __dirname + "/uploads/uploadedFileName";
-		  fs.writeFile(newPath, data, function (err) {
-			res.redirect("back");
-		  });
-		});
-	*/
-
-
-	//console.log('email-'+email)
-	
-	/*var user_id = req.body.user_id
-    console.log(text+"---"+user_id)
-	//вытаскиваем пользователя
-    var user = User.build();
-	//	GetUser(user,req,res,);	
-	
-		    user.retrieveById(user_id, function(users) {
-			if (users) {
-					//res.json(users);
-					var message = Message.build({ text: text}).save().then(function(message){
-                    users.addMessage(message); console.log('sssFFFFFssssssssss');});				
-				}else {
-				res.send(401, "User not found1");
-			}
-			},
-				function(error) {
-				res.send("User not found2");
-				}
-			);	*/
 });
 
+
+//var busboy = require('connect-busboy');
+//app.use(busboy()); 
+
+//https://codeforgeek.com/2014/07/send-e-mail-node-js/
+//https://accounts.google.com/b/0/DisplayUnlockCaptcha
+//https://www.google.com/settings/security/lesssecureapps
+//http://localhost:3001/sendEmail
+//app.post('/sendEmail',ensureAuthorized, function(req, res) {
+app.get('/sendEmail', function(req, res) {
+var nodemailer = require('nodemailer');
+	var transporter = nodemailer.createTransport("SMTP",{
+		service: 'Gmail',
+		auth: {
+			user: 'fornodejs@gmail.com',
+			pass: 'bumerang01'
+		}
+	});
+	transporter.sendMail({
+		//from: 'ponachen@mail.ru',
+		to: 'ponachen@mail.ru',
+		subject: 'hello',
+		text: 'hello world!'
+	},function(error, response){
+		if(error){
+		console.log(error);
+		res.end("error");
+		}else{
+		console.log("Message sent: " + response.message);
+		res.end("sent");
+		}
+	}
+	
+	);
+	console.log('пошел11');
+});
 
 app.set("view options", {layout: false});
 app.use(express.static(__dirname + '/angular'));
@@ -507,6 +482,7 @@ app.get('/', function(req, res) {
 process.on('uncaughtException', function(err) {
     console.log(err);
 });
+
 
 
 

@@ -375,6 +375,8 @@ angular.module("angularRestfulAuth", [
 					$scope.UsersOnPage = res.data;
 					fotoCheck();
 							
+							
+							
 							//var target = angular.element('appBusyIndicator');
 							//var myEl = angular.element( document.querySelector( '#some-id' ) );
 							//var myEl = $document.find('#some-id'));
@@ -442,6 +444,18 @@ angular.module("angularRestfulAuth", [
 		  }		  
 		  
 }])
+ .directive('popoverEl', function() {
+    return {
+        // Restrict it to be an attribute in this case
+        restrict: 'A',
+        // responsible for registering DOM listeners as well as updating the DOM
+        link: function(scope, element, attrs) {
+            //$(element).toolbar(scope.$eval(attrs.toolbarTip));
+			$(element).popover(scope.$eval(attrs.popoverEl));
+        }
+    };
+})
+
  /*  .controller('SaveFile', ['$rootScope', '$scope', '$http', '$location', 'Main', function($rootScope, $scope, $http, $location, Main) {
            var baseUrl = "http://localhost:3001";
 		   var url = "http://localhost:3001";
