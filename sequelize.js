@@ -60,8 +60,18 @@ sequelize.sync().then(function() {
 var port = process.env.PORT || 3001;
 var User = require('./models/Userseq');
 var Message = require('./models/messagesSeq');
+var ChatMessage = require('./models/chatMessagesSeq');
 
 User.hasMany(Message, {foreignKey: 'user_id' });
+//User.hasMany(ChatMessage, {foreignKey: 'id_user' });
+ChatMessage.belongsTo(User, {foreignKey: 'id_user'})
+
+//	//inner join   ChatMessage.findAll({ include: [{model: User, id: user.id}]}).then(function(mess) {//id_user
+
+//создание  сообщенияв базе
+//Messages.build({ text: "dfhdghdfgdfgdfg", user_id: 5 }).save()
+//ChatMessage.build({ id_chat:1,text: "1 й чат 55 узер 2 сообщ", id_user: 55 }).save()
+
 //http://sequelize.readthedocs.org/en/latest/api/associations/index.html?highlight=hasMany
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -93,7 +103,7 @@ app.post('/signin', function(req, res) {
 				//res.send(401, "Such User Already Exist");
 				//res.json(users);
 			} else {
-				AddUser();
+				AddUser(req, res);
 			}
         },
         function(error) {
@@ -101,21 +111,33 @@ app.post('/signin', function(req, res) {
     });
 	
     
-	function AddUser(){
+	function AddUser(req, res){
 		console.log('Adding user - '+email+"---"+password)
 		var token = jwt.sign({email:email,password:password}, process.env.JWT_SECRET || 'secret key');
-		console.log('token-'+token);	
-		var user = User.build({ email: email, password: password, token:token});
+		console.log('token-'+token);
+		
+		var crypto = require('crypto');
+			var md5HashHex = crypto.createHash('md5')
+				.update(email)
+				.update('sole sole sole')
+				.digest('hex');		
+		var user = User.build({ email: email, password: password, token:token, hex:md5HashHex});
 
 
 		user.add(function(user){
 			//res.json(user);
+						console.log('отправляем письмо');
+						var send = require('./scripts/sendmail');
+						send.sendMail(req, res, user);						
+						/*
 						console.log('aded 11')
 			            res.json({
                             type: true,
                             data: user,
-                            token: user.token
+                            //token: user.token
                         });
+						//отправляем письмо для подтверждения
+*/
 			
 			
 			//res.json({ message: 'User created!' });
@@ -157,7 +179,7 @@ app.get('/AllUsers', function(req, res) {
 });
 
 //http://localhost:3001/AllUsers/5/15
-app.get('/AllUsers/:beg_id/:end_id', function(req, res) {
+app.get('/AllUsers/:beg/:num', function(req, res) {
 	//вытаскиваем пользователей
     var user = User.build();
 	//	GetUser(user,req,res,);	
@@ -210,10 +232,6 @@ app.post('/addMessage', function(req, res) {
 	var text = req.body.text
 	var user_id = req.body.user_id
     console.log(text+"---"+user_id)
-
-
-	
-	
 	//вытаскиваем пользователя
     var user = User.build();
 	//	GetUser(user,req,res,);	
@@ -223,9 +241,6 @@ app.post('/addMessage', function(req, res) {
 					//res.json(users);
 					var message = Message.build({ text: text}).save().then(function(message){
                     users.addMessage(message); console.log('sssFFFFFssssssssss');});				
-				
-					
-					
 				}else {
 				res.send(401, "User not found1");
 			}
@@ -238,6 +253,8 @@ app.post('/addMessage', function(req, res) {
 	//user.getMessages(
 
 });
+
+
 
 
 //создание  сообщенияв базе
@@ -349,11 +366,20 @@ app.post('/login', function(req, res) {
   // User.findOne({token: req.token}, function(err, user) {
 	   User.find({where: {email: email,password: password}})
 	   .then(function(user){
-					res.json({
-						type: true,
-						data: user
-					});
-                    console.log('Ok HERE-10'+user.email);
+					if(user.confirmed == 1){
+						res.json({
+							type: true,
+							data: user
+						});
+						console.log('Ok user sended HERE-10'+user.email);
+					}else{
+						res.json({
+							type: true,
+							data: "Вы не подтавердили регистрацю, проверьте свою почту."
+						});						
+						console.log('No user not confirmed HERE-11'+user.email);
+					}
+                    
 					//console.log('sssssssssssss');
                 }).catch(function(e) {
                     res.json({
@@ -443,33 +469,132 @@ app.post('/SaveFile',ensureAuthorized, function(req, res) {
 //https://www.google.com/settings/security/lesssecureapps
 //http://localhost:3001/sendEmail
 //app.post('/sendEmail',ensureAuthorized, function(req, res) {
-app.get('/sendEmail', function(req, res) {
-var nodemailer = require('nodemailer');
-	var transporter = nodemailer.createTransport("SMTP",{
-		service: 'Gmail',
-		auth: {
-			user: 'fornodejs@gmail.com',
-			pass: 'bumerang01'
-		}
-	});
-	transporter.sendMail({
-		//from: 'ponachen@mail.ru',
-		to: 'ponachen@mail.ru',
-		subject: 'hello',
-		text: 'hello world!'
-	},function(error, response){
-		if(error){
-		console.log(error);
-		res.end("error");
-		}else{
-		console.log("Message sent: " + response.message);
-		res.end("sent");
-		}
-	}
+// потом удалить (для проверки)
+app.get('/sendEmail', function(req, res){
+	var send = require('./scripts/sendmail');
+	send.sendMail(req, res);
 	
-	);
-	console.log('пошел11');
 });
+
+//подтверждение регистрации
+app.get('/toConfirm/:hex', function(req, res){
+	console.log('toConfirm')
+	var send = require('./scripts/sendmail');
+	send.ConfirmHex(req, res);
+	
+});
+
+//получить все сообщения в чате по токену пользователя
+//app.get('/chatMess/:page',ensureAuthorized, function(req, res){
+app.post('/chatMess',ensureAuthorized, function(req, res){
+	 //User.find({where: {token: req.token}})
+	console.log('chatMess')
+	//req.params.user_id
+	   User.find({where: {token: req.token}})
+	   .then(function(user){
+						   console.log('getChatMessage-'+user.id_chat);
+						//inner join   ChatMessage.findAll({ include: [{model: User, id: user.id}]}).then(function(mess) {//id_user
+						   
+						//  ChatMessage.findAll({ where: {id_chat: user.id_chat},  include: [User], order: 'id DESC'}).then(function(mess) {//id_user
+						ChatMessage.findAll({ where: {id_chat: user.id_chat},  include: [User],  offset: req.body.beg, limit: req.body.num, order: 'id DESC'}).then(function(mess) {
+						//user.getChatMessage({where: {id_chat: user.id_chat}}).then(function(mess) {//id_user
+						//user.getChatMessage({where: {id_user: user.id}}).then(function(mess) {//id_user
+							if (mess) {
+									res.json({
+										type: true,
+										data: mess
+									});
+								
+								//res.json(mess);
+							} else {
+								res.send(401, "ChatMess not found1");
+							}
+						}).catch(function(e) {
+								res.send("ChatMess not found2"+e);
+							}
+						)
+					
+                    console.log('Ok HERE-17');
+					//console.log('sssssssssssss');
+                }).catch(function(e) {
+                    res.json({
+						type: false,
+						data: "Error occured: " + err
+					});
+                    console.log('Error HERE-16');
+					//console.log("Project update failederewrewrew !");
+                });
+});
+
+
+//возвращает кол-во сообщений в чате для пэйджинга
+//app.get('/numChatMess/:id_chat', function(req, res) {
+app.get('/numChatMess',ensureAuthorized, function(req, res) {
+	User.find({where: {token: req.token}})
+		.then(function(user){
+					console.log('getnumChatMess-'+user.id_chat);
+					ChatMessage.count({ where: {id_chat: user.id_chat} }).then(function(chatMessscol){
+					if (chatMessscol) {
+							//res.json(users);
+							console.log(chatMessscol);
+						res.json({
+							type: true,
+							data: chatMessscol
+						});
+							console.log('chatMessscol users HERE-12'+chatMessscol);
+						}else {
+						res.send(401, "chatMessscol not found1");
+					}
+
+					}).catch(function(error) {
+						res.send("User not found2");
+					});
+				
+			}).catch(function(e) {
+				res.json({
+					type: false,
+					data: "Error occured: " + err
+				});
+				console.log('Error HERE-16');
+				//console.log("Project update failederewrewrew !");
+			});	
+});
+
+
+app.post('/SaveChatMess',ensureAuthorized, function(req, res) {
+    console.log(req.body.chatMess);
+	var text = req.body.chatMess
+	//var user_id = req.body.user_id
+	//вытаскиваем пользователя
+	  User.find({where: {token: req.token}})
+	   .then(function(user){
+			console.log('SAveChatMessage-'+user.id);
+			//build({ text: text}).save()
+			//ChatMessage.add({id_chat: 1, id_user:user.id, text:text});
+			ChatMessage.build({id_chat: 1, id_user:user.id, text:text}).save()
+				.then(function(mess){
+					console.log('сообщение сохранено SaveChatMess');
+					 res.json({
+						type: true,
+						data: "сообщение сохранено"
+					});
+				}).catch(function(e) {
+                    res.json({
+						type: false,
+						data: "ошибка сообщения сохранения"
+					});
+                    console.log('Error HERE-SaveChatMess');
+				});
+		}).catch(function(e) {
+                    res.json({
+						type: false,
+						data: "user not found: " + err
+					});
+                    console.log('Error HERE-SaveChatMess');
+         });
+});
+
+
 
 app.set("view options", {layout: false});
 app.use(express.static(__dirname + '/angular'));

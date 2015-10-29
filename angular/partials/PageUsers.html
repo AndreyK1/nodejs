@@ -1,13 +1,42 @@
 PageUsers.html numUssers - {{numUssers}}
 
 <br />
-
+<!--
 <div class="row col-md-12">
 <span ng-repeat="page in pages">
 	<!--<span ng-click="GetUsers(page.beg,page.end)">{{page.num}}</span><!--page.beg,beg.end-->
-	<a  href="#PageUsers/{{page.num}}"> {{page.num}}</a>
+	<!--<a  href="#PageUsers/{{page.num}}"> {{page.num}}</a>
 </span>
-</div>
+</div>-->
+
+
+<ul class="pagination row col-md-12">
+  <li class="{{(currentPageNum ==1)?'disabled':'' }}" ><a href="#PageUsers/1"><<</a></li>
+	<li class="{{(currentPageNum ==1)?'disabled':'' }}" >
+		<a ng-show="currentPageNum > 1" href="#PageUsers/{{currentPageNum-1}}"><</a>
+		<span ng-show="currentPageNum < 2" ><</span>
+	</li>
+	<li ng-show="pages[0].num < pagesShow[0].num" >
+		<span >...</span>
+	</li>	
+	
+  <li ng-repeat="page in pagesShow" class="{{(page.num ==currentPageNum)?'active':'' }}" ><a href="#PageUsers/{{page.num}}">{{page.num}}</a></li>
+	
+	<li ng-show="pages[pages.length-1].num > pagesShow[pagesShow.length-1].num" >
+		<span >...</span>
+	</li>	  
+  
+  <li class="{{(currentPageNum ==pages.length)?'disabled':'' }}"  >
+	<a ng-show="currentPageNum < pages.length" href="#PageUsers/{{(currentPageNum-1)+2}}">></a>
+	<span ng-show="currentPageNum > (pages.length-1)" >></span>
+	
+
+	
+  </li>
+  <li class="{{(currentPageNum ==pages.length)?'disabled':'' }}" ><a href="#PageUsers/{{pages.length}}">>></a></li>
+</ul>
+
+
 <!--https://amitgharat.wordpress.com/2013/02/03/an-approach-to-use-jquery-plugins-with-angularjs/
 http://itchief.ru/lessons/bootstrap-3/99-bootstrap-3-popovers
 <!--https://code.google.com/p/resize-crop/ -->

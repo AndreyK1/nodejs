@@ -10,7 +10,10 @@ var User = sequelize.define('users', {
     email: Sequelize.STRING,
     password: Sequelize.STRING,
 	foto: Sequelize.STRING,
-    token: Sequelize.STRING
+    token: Sequelize.STRING,
+	hex: Sequelize.STRING,
+	confirmed: Sequelize.INTEGER,
+	id_chat: Sequelize.INTEGER
 }, {
     instanceMethods: {
         retrieveAll: function(onSuccess, onError) {
@@ -40,8 +43,9 @@ var User = sequelize.define('users', {
             var email = this.email;
             var password = this.password;
 			var	token = this.token;
+			var	hex = this.hex;
 
-            User.build({ email: email, password: password, token:token })
+            User.build({ email: email, password: password, token:token, hex:hex})
 			.save().then(function(user){
                     onSuccess(user)
                     console.log('add - sucsess');
@@ -63,13 +67,14 @@ var User = sequelize.define('users', {
         },
 		retrieveUsersWithin: function(params, onSuccess, onError) {
             //User.find({where: {id: user_id, email: 'eeeee2'}})
-            User.findAll({where: {
+          /*  User.findAll({where: {
 					//id: params.beg_id  
 						id: {
 								  $lt: params.end_id,
 								  $gt: params.beg_id
 							  }
-					}})
+					}})*/
+					User.findAll({ offset: params.beg, limit: params.num, order: 'id' })
                 .then(function(user){
                     onSuccess(user)
                     console.log('retrieveUsersWithin-sucsess');

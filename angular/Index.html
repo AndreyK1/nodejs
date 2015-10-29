@@ -11,11 +11,28 @@
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	
 	<link rel="stylesheet" href="css/style.css">
-	<script src="scripts/controllers.js"></script>	
+	<script src="scripts/controllers.js"></script>
+	<script src="scripts/routers.js"></script>	
 	
 	<title>Restful Authentication with NodeJS & AngularJS</title>
 	
 	<script>
+	
+			  //проверяем фотки, если нету, товставляем no foto
+		  function fotoCheckCom(UsersOnPage){
+			  //alert(UsersOnPage.length)
+			  for(var i=0; i<UsersOnPage.length;i++){
+				  if(UsersOnPage[i].foto ==null){
+					  //alert('null-'+$scope.UsersOnPage[i].email)
+					  UsersOnPage[i].foto = 'img/no.jpg'
+				  }else{
+					  //alert('UsersOnPage[i].foto='+i+UsersOnPage[i].foto);
+					  UsersOnPage[i].foto = 'foto/'+UsersOnPage[i].foto;
+				  }
+			  }
+			  return UsersOnPage;
+		  }
+		  
 		/*$(document).ready(function(){
 			$('[data-toggle="popover"]').popover(); 
 			alert('ghjghj');
@@ -50,7 +67,7 @@
 							
 							 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 								<ul class="nav navbar-nav">
-									<li><a href="#">Link</a></li>
+									<li><a href="#/Chat/1">Chat</a></li>
 									<li class="dropdown">
 									  <a  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 											Dropdown <span class="caret"></span>

@@ -13,10 +13,12 @@ angular.module("angularRestfulAuth", [
 		//$scope.user={};
 		$scope.registr=null
 		
-		$rootScope.PathToNode = '../';
+	//	$rootScope.PathToNode = '../';
 		
 		$scope.CurrentUser = Main.getCurrentUser();
 		
+		
+	
 		$scope.signin = function() {
 			//alert('signin');
             var formData = {
@@ -28,10 +30,20 @@ angular.module("angularRestfulAuth", [
                 if (res.type == false) {
                     alert(res.data)    
                 } else {
-                   $localStorage.token = res.data.token;
+                   if(res.message){
+					   alert(res.message);
+				   }else{
+						alert(document.location.href.split('#')[0] + '#/confirm/'+res.data.email)
+						document.location.href = document.location.href.split('#')[0] + '#/confirm/'+res.data.email;
+				   }
+				 /*  
+				   $localStorage.token = res.data.token;
                     $scope.token =$localStorage.token;
 					$scope.user = res.data;
 					$scope.CurrentUser= res.data;
+				*/	
+					
+					
 					//$rootScope.user =  $scope.user;
 					//$scope.user = JSON.parse(res.data);
 
@@ -109,13 +121,18 @@ angular.module("angularRestfulAuth", [
 				if (res.type == false) {
                     alert(res.data)    
                 } else {
-                   $localStorage.token = res.data.token;
-                    $scope.token =$localStorage.token;
-					$scope.user = res.data;
-					$scope.CurrentUser= res.data;
-					//$rootScope.user =  $scope.user;
-					//$scope.user = JSON.parse(res.data);
-
+					//alert('here')
+					if(res.data.token){
+					   $localStorage.token = res.data.token;
+						$scope.token =$localStorage.token;
+						$scope.user = res.data;
+						$scope.CurrentUser= res.data;
+						//$rootScope.user =  $scope.user;
+						//$scope.user = JSON.parse(res.data);
+					}else{//пользователь не подтвержден
+						alert(res.data)
+						document.location.href = document.location.href.split('#')[0] + '#/NoConfirmed/1';
+					}
 					//alert('its ok')
 					//window.location = "/";  
 					//$scope.CurrentUser = Main.getCurrentUser();
@@ -166,11 +183,11 @@ angular.module("angularRestfulAuth", [
         var currentUser = getUserFromToken();
  
         return {
-            save: function(data, success, error) {
-                $http.post(baseUrl + '/signin', data).success(success).error(error)
+           // save: function(data, success, error) {
+            //    $http.post(baseUrl + '/signin', data).success(success).error(error)
 				//$http.get('http://api/user').then(function(response){responseData = response.data; });
 				//$http.post('/someUrl', data, config).then(successCallback, errorCallback);
-            },
+            //},
             signin: function(data, success, error) {
                 $http.post(baseUrl + '/signin', data).success(success).error(error)
             },
@@ -182,7 +199,7 @@ angular.module("angularRestfulAuth", [
             },
 			//localhost:3001/AllUsers/5/15
 			AllUsersWithin: function(data,success, error) {
-                $http.get(baseUrl + '/AllUsers/'+data.beg_id+'/'+data.end_id).success(success).error(error)
+                $http.get(baseUrl + '/AllUsers/'+data.beg+'/'+data.num).success(success).error(error)
             },
             getCurrentUser: function(r) {
                 return currentUser;
@@ -217,69 +234,7 @@ angular.module("angularRestfulAuth", [
 		
 		
  }])
- .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
-   $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function($q, $location, $localStorage) {
-            //alert('here-1');
-			return {
-                'request': function (config) {
-                    config.headers = config.headers || {};
-                    if ($localStorage.token) {
-                        config.headers.Authorization = 'Bearer ' + $localStorage.token;
-                    }
-                    return config;
-                },
-                'responseError': function(response) {
-                    if(response.status === 401 || response.status === 403) {
-                        $location.path('/signin');
-                    }
-                    return $q.reject(response);
-                }
-            };
-        }]);
-		
-		//http://viralpatel.net/blogs/angularjs-routing-and-views-tutorial-with-example/
-		$routeProvider.
-        when('/', {
-            templateUrl: './partials/home.html',
-            controller: 'HomeCtrl'
-        }).
-        when('/signin', {
-            templateUrl: './partials/signin.html',
-            controller: 'HomeCtrl'
-			//foodata: $scope.user;
-        }).
-        /*when('/signup', {
-            templateUrl: 'partials/signup.html',
-            controller: 'HomeCtrl'
-        }).*/
-        when('/me', {
-            templateUrl: 'partials/me.html',
-            //controller: 'HomeCtrl'
-			controller: 'MeCtrl'
-        }).
-		when('/AllUsers', {
-            templateUrl: 'partials/AllUsers.html',
-            controller: 'AllUsersCtrl'
-        }).
-		when('/PageUsers/:beg_id', {
-            templateUrl: 'partials/PageUsers.html',
-            controller: 'PageUsersCtrl'
-        }).
-		/*when('/SaveFile', {
-            templateUrl: 'partials/saveFile.html',
-            controller: 'SaveFile'
-          }).*/
-		when('/watch_examlpe', {
-            templateUrl: 'partials/watch_ex.html',
-            controller: 'watch_examlpe'      
-		}).
-        otherwise({
-            redirectTo: '/'
-        });
-  
-  
-  }])
-   .controller('MeCtrl', ['$rootScope', '$scope','$http', '$location', 'Main', function($rootScope, $scope,$http, $location, Main) {
+    .controller('MeCtrl', ['$rootScope', '$scope','$http', '$location', 'Main', function($rootScope, $scope,$http, $location, Main) {
 	  var baseUrl = $rootScope.baseUrl
 	 // var baseUrl = "http://localhost:3001";
 	  //$scope.user.token = 'shit';
@@ -353,7 +308,7 @@ angular.module("angularRestfulAuth", [
    .controller('PageUsersCtrl', ['$rootScope', '$scope','$routeParams','$sce', '$http','$location', 'Main', function($rootScope, $scope,$routeParams,$sce,$http,$location, Main) {
          // alert('hhhhh');
 		  var baseUrl = $rootScope.baseUrl
-		  var PathToNode = $rootScope.PathToNode
+	//	  var PathToNode = $rootScope.PathToNode
 		  
 		  $scope.sce = $sce;
 		  $scope.pageslist = '';
@@ -361,20 +316,30 @@ angular.module("angularRestfulAuth", [
 		  $scope.PageNum = 1;
 		  $scope.pageSize = 12;
 		  $scope.numUssers =0;
+		/*  
+		$scope.checkPage = function(){
+			alert($scope.currentPageNum)
+			if($scope.currentPageNum < 1){ $scope.currentPageNum =1;}
+			if($scope.currentPageNum > $scope.pages.length){ $scope.currentPageNum =$scope.pages.length;}
+		}*/
 		  
-		  if($routeParams.beg_id)
-		  $scope.currentPageNum =  $routeParams.beg_id;
+		  if($routeParams.beg)
+		  $scope.currentPageNum =  $routeParams.beg;
 		  
 		  
-		  $scope.GetUsers = function(beg_id,end_id){
+		  $scope.GetUsers = function(beg,num){
+			 // alert("beg-"+beg+" num-"+num)
+			  //page[0] < pagesShow[0]
+
 			  var dat={
-				  beg_id:beg_id,
-				  end_id:end_id
+				  beg:beg,
+				  num:num
 			  }
 			  Main.AllUsersWithin(dat,function(res) {
-					$scope.UsersOnPage = res.data;
-					fotoCheck();
-							
+					//$scope.UsersOnPage = res.data;
+					//fotoCheck();
+						
+					$scope.UsersOnPage = fotoCheckCom(res.data)						
 							
 							
 							//var target = angular.element('appBusyIndicator');
@@ -397,7 +362,10 @@ angular.module("angularRestfulAuth", [
 					$rootScope.error = 'Failed to fetch UsersOnPage';
 				}
 			  )
+			  
 		  }
+		  
+/*		  
 		  //проверяем фотки, если нету, товставляем no foto
 		  function fotoCheck(){
 			  for(var i=0; i<$scope.UsersOnPage.length;i++){
@@ -409,14 +377,17 @@ angular.module("angularRestfulAuth", [
 				  }
 			  }
 		  }
-		  
+*/		  
 		  //GetUsers(1,$scope.pageSize+1);
-		  $scope.GetUsers($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.currentPageNum*$scope.pageSize+1 )
+		 // $scope.GetUsers($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.currentPageNum*$scope.pageSize+1 )
+		  $scope.GetUsers($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.pageSize )
+
 		  
 		  $http.get(baseUrl + '/numUssers').success(function(res){
 			  	if (res.type == false) {
                    // alert(res.data)    
                 } else {
+					//alert(res.data);
                    $scope.numUssers = res.data;
 				   $scope.PageNum = Math.ceil($scope.numUssers/$scope.pageSize);
 				   
@@ -428,19 +399,33 @@ angular.module("angularRestfulAuth", [
 		  )
 		  
 		$scope.pages=[];
+		$scope.pagesShow=[];
 		  function GetPagesRow(){//рисуем страницы
 				//alert($scope.pages); 			  
 			  for(var i=1; i< $scope.PageNum+1;i++){
-				  
-				  $scope.pages.push({num : i//, 
+					$scope.pages.push({num : i//, 
 									//beg : i*$scope.pageSize-$scope.pageSize+1, 
 									//end : i*$scope.pageSize+1	
-									})
+									})				  
+				  
+				  if((i>$scope.currentPageNum-2) && (i<$scope.currentPageNum-1+3)){//отсекаем только нужные 
+					//console.log(' i-'+i+' currentPageNum-'+$scope.currentPageNum)
+							$scope.pagesShow.push({num : i//, 
+									//beg : i*$scope.pageSize-$scope.pageSize+1, 
+									//end : i*$scope.pageSize+1	
+							})
+				  }				
 				  //$scope.pageslist += " "+i.toString();
 					//$scope.pageslist += "<span ng-click=\"ChangePage("+i+")\"  > "+i+" </span>";
 				 //<p ng-bind-html="sce.trustAsHtml(pageslist)"></p> 
 			  }
 			//alert($scope.pages);
+			
+			/*if($scope.pages){ 
+			  console.log('pages[0]-'+$scope.pages[0].num+' pagesShow[0]-'+$scope.pagesShow[0].num)
+			  console.log('pages[pages.length]-'+$scope.pages[$scope.pages.length-1].num+' pagesShow[pagesShow.length]-'+$scope.pagesShow[$scope.pagesShow.length-1].num)
+			 
+			 }*/
 		  }		  
 		  
 }])
@@ -547,6 +532,7 @@ angular.module("angularRestfulAuth", [
 				};*/
 //}])
    .controller('watch_examlpe', ['$rootScope', '$scope','$sce', '$document', '$location', 'Main', function($rootScope, $scope,$sce,$document,$location, Main) {
+		
 		// good example in directive
 		//https://thinkster.io/egghead/angular-element
 		
@@ -604,9 +590,173 @@ angular.module("angularRestfulAuth", [
 			});*/
 
 }])
+   .controller('registrCntrl', ['$rootScope', '$scope','$routeParams','$http','$document', '$location', 'Main', function($rootScope, $scope,$routeParams,$http,$document,$location, Main) {
+ 		if($routeParams.email){
+			$scope.email =  $routeParams.email;
+			//$scope.mess = 
+			//$scope.hex = hex_md5(email);
+		}
+		if($routeParams.hex){
+			var baseUrl = $rootScope.baseUrl
+			$scope.hex =  $routeParams.hex;
+			$scope.mess = '';
+			//проверяем есть ли такой ользователь, и если есть активизируем
+			
+				$http.get(baseUrl + '/toConfirm/'+$scope.hex).success(function(res){
+			  	if (res.type == false) {
+					$scope.mess = 'подтверждение не удалось'
+                   //alert('подтверждение не удалось')    
+                } else {
+					$scope.mess = res.data
+                  //alert('подтверждение Удалось!')  
+				  // $scope.numUssers = res.data;
+				   //$scope.PageNum = Math.ceil($scope.numUssers/$scope.pageSize);
+				   
+				  // GetPagesRow();
+				}	  
+				  }).error(function() {
+					  $scope.mess ='подтверждение не удалось'
+						$rootScope.error = 'Failed to toConfirm';
+						}	  
+				  )
+			
+			
+			//$scope.mess = 
+			//$scope.hex = hex_md5(email);
+		}
+		if($routeParams.mess){
+			$scope.mess = "Вы не подтавердили регистрацю, проверьте свою почту."
+		}
+		
+}])		
+   .controller('chatCntrl', ['$rootScope', '$scope','$routeParams','$http','$document', '$location', 'Main', function($rootScope, $scope,$routeParams,$http,$document,$location, Main) {
+	//	  $scope.sce = $sce;
+	//	  $scope.pageslist = '';
+		//$scope.chat_id;
+		  $scope.currentPageNum = 1;
+		  $scope.PageNum = 1;
+		  $scope.pageSize = 4;
+		  $scope.numMessages =0;
+		
+		$scope.myMess = '';
+		
+		$scope.messages = [];
+		var baseUrl = $rootScope.baseUrl
+		
+		
+		if($routeParams.page)
+			$scope.currentPageNum =  $routeParams.page;		  
+		  
+		 // $scope.GetUsers = function(beg_id,end_id){
+		
+		
+		//получение сообщений из чата
+		$scope.GetMess  = function(beg,num){
+			  //alert("beg-"+beg+" num-"+num)
+			  var data={
+				  beg:beg,
+				  num:num
+			  }
+			//$http.get(baseUrl + '/chatMess/'+$scope.currentPageNum+"/"+).success(function(res){
+			$http.post(baseUrl + '/chatMess',data).success(function(res){
+					if (res.type == false) {
+						$scope.mess = 'получить сообщкения не удалось'
+					   //alert('подтверждение не удалось')    
+					} else {
+						$scope.messages = res.data
+					//	alert('scope.messages[0].text-'+$scope.messages[0].text)
+					//	GetnumChatMess(res.data[0].user.id_chat)
+						for(var i=0; i<$scope.messages.length; i++){
+							//alert($scope.messages[i].user.foto)
+							//alert('i='+i+fotoCheckCom(new Array($scope.messages[i].user))[0].foto)
+							$scope.messages[i].user = fotoCheckCom(new Array($scope.messages[i].user))[0];
+						}
+						//$scope.UsersOnPage = fotoCheckCom(res.data)	
+						
+					  //alert(res.data)  
+					  // $scope.numUssers = res.data;
+					   //$scope.PageNum = Math.ceil($scope.numUssers/$scope.pageSize);
+					   
+					  // GetPagesRow();
+					}	  
+					  }).error(function() {
+						  $scope.err ='получить сообщкения не удалось'
+							$rootScope.error = 'Failed to chatMess';
+					})
+		}
+		//$scope.GetMess($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.currentPageNum*$scope.pageSize+1 )
+		$scope.GetMess($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.pageSize )
+		
+		//сохранение сообщения
+		$scope.saveMess = function(){
+			//alert($scope.myMess);
+						var data = {
+							//id_user: 675,
+							chatMess: $scope.myMess
+						}
 
- 
- 
+					$http.post(baseUrl + '/SaveChatMess', data).success(function(res){
+			  	if (res.type == false) {
+					$scope.err = 'coхранить сообщкение не удалось'
+                   alert(res.data)    
+                } else {
+					  
+					  alert("ok "+res.data)  
+					  $scope.GetMess($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.pageSize )
+					  // $scope.numUssers = res.data;
+					   //$scope.PageNum = Math.ceil($scope.numUssers/$scope.pageSize);
+					   
+					  // GetPagesRow();
+					}	  
+				  }).error(function() {
+					  $scope.err ='coхранить сообщкение не удалось'
+						$rootScope.error = 'Failed to chatMess';
+				})
+			
+		}
+		
+		
+		function GetnumChatMess(){
+			//alert('GetnumChatMess-')
+			//$http.get(baseUrl + '/numChatMess/'+id_chat).success(function(res){
+			$http.get(baseUrl + '/numChatMess').success(function(res){
+					if (res.type == false) {
+					   // alert(res.data)    
+					} else {
+						//alert(res.data);
+					   $scope.numMess = res.data;
+					   //alert('scope.numMess-'+$scope.numMess)
+					   $scope.PageNum = Math.ceil($scope.numMess/$scope.pageSize);
+					   
+					   GetPagesRow();
+					}	  
+			  }).error(function() {
+					$rootScope.error = 'Failed to numUssers';
+					}	  
+			  )
+		}
+		GetnumChatMess()
+		
+		$scope.pages=[];
+		$scope.pagesShow=[];
+		  function GetPagesRow(){//рисуем страницы
+				//alert($scope.pages); 			  
+			  for(var i=1; i< $scope.PageNum+1;i++){
+					$scope.pages.push({num : i//, 
+									//beg : i*$scope.pageSize-$scope.pageSize+1, 
+									//end : i*$scope.pageSize+1	
+									})				  
+				  
+				  if((i>$scope.currentPageNum-2) && (i<$scope.currentPageNum-1+3)){//отсекаем только нужные 
+					//console.log(' i-'+i+' currentPageNum-'+$scope.currentPageNum)
+							$scope.pagesShow.push({num : i//, 
+							})
+				  }				
+			  }
+			//alert($scope.pages);
+		  }	
+		
+ }])	
  /*;
 
 angular.module('angularRestfulAuth', [

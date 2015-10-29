@@ -1,0 +1,43 @@
+chat1.html 
+
+<br />
+
+<ul class="pagination row col-md-12">
+  <li class="{{(currentPageNum ==1)?'disabled':'' }}" ><a href="#Chat/1"><<</a></li>
+	<li class="{{(currentPageNum ==1)?'disabled':'' }}" >
+		<a ng-show="currentPageNum > 1" href="#Chat/{{currentPageNum-1}}"><</a>
+		<span ng-show="currentPageNum < 2" ><</span>
+	</li>
+	<li ng-show="pages[0].num < pagesShow[0].num" >
+		<span >...</span>
+	</li>	
+  <li ng-repeat="page in pagesShow" class="{{(page.num ==currentPageNum)?'active':'' }}" ><a href="#Chat/{{page.num}}">{{page.num}}</a></li>
+	<li ng-show="pages[pages.length-1].num > pagesShow[pagesShow.length-1].num" >
+		<span >...</span>
+	</li>	  
+   <li class="{{(currentPageNum ==pages.length)?'disabled':'' }}"  >
+	<a ng-show="currentPageNum < pages.length" href="#Chat/{{(currentPageNum-1)+2}}">></a>
+	<span ng-show="currentPageNum > (pages.length-1)" >></span>
+  </li>
+  <li class="{{(currentPageNum ==pages.length)?'disabled':'' }}" ><a href="#Chat/{{pages.length}}">>></a></li>
+</ul>
+
+
+			
+<!---->
+token - {{token}}
+
+<div class="row">
+<div ng-show="err" class="col-md-12" >{{err}}</div>
+<textarea ng-model="myMess" /></textarea>
+<button ng-click="saveMess()" />сохранить</button>
+<div class="col-md-12" ng-repeat="mess in messages">
+		<div>
+			<img popover-el="{ title:'user id - {{mess.user.id}}' ,content: 'user email - {{mess.user.email}}', placement: 'right'}"  
+				class="popo"  width="250px" ; style="height:250px;" src="{{mess.user.foto}}"  
+				data-toggle="popover" data-trigger="hover"    />		
+			{{mess.id}}-{{mess.text}}
+		</div>
+		<!--<img popover-el="{ title:'user id - {{user.id}}' ,content: 'user email - {{user.email}}', placement: 'right'}"  class="popo"  width="250px" ; style="height:250px;" src="{{user.foto}}"  data-toggle="popover" data-trigger="hover"    />-->
+</div>
+</div>
