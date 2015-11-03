@@ -1,7 +1,19 @@
-chat1.html 
+admin.html 
+<!--
+<br />
+token - {{token}}
+<p>Админская консоль</p>
 
 <br />
+<p>id Пользователя которого встретил</p>
+<input ng-model="id_meeted" ng-click="MeetUser()" />
+<button ng-click="MeetUser()" >встретить</button>
 
+<div class="col-md-12" ng-repeat="chat in chats">
+	<span>user.email-{{chat.email}} user.id-{{chat.id}} user.id_chat-{{chat.id_chat}} user.col_us-{{chat.col_us}} </span>
+</div>
+-->
+<!--
 <ul class="pagination row col-md-12">
   <li class="{{(currentPageNum ==1)?'disabled':'' }}" ><a href="#Chat/1"><<</a></li>
 	<li class="{{(currentPageNum ==1)?'disabled':'' }}" >
@@ -24,9 +36,9 @@ chat1.html
 
 
 			
-<!---->
-token - {{token}}
+-->
 
+<!--
 <div class="row">
 <div ng-show="err" class="col-md-12" >{{err}}</div>
 <textarea ng-model="myMess" /></textarea>
@@ -38,6 +50,6 @@ token - {{token}}
 				data-toggle="popover" data-trigger="hover"    />		
 			{{mess.id}}-{{mess.text}}
 		</div>
-		<!--<img popover-el="{ title:'user id - {{user.id}}' ,content: 'user email - {{user.email}}', placement: 'right'}"  class="popo"  width="250px" ; style="height:250px;" src="{{user.foto}}"  data-toggle="popover" data-trigger="hover"    />-->
 </div>
 </div>
+-->

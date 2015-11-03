@@ -70,6 +70,10 @@ angular.module("angularRestfulAuth")
 		when('/Chat/:page', {
             templateUrl: 'partials/chat.html',
             controller: 'chatCntrl'   
+		}).	
+		when('/admin', {
+            templateUrl: 'partials/admin.html',
+            controller: 'adminCntrl'   
 		}).			
         otherwise({
             redirectTo: '/'

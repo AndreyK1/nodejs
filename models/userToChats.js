@@ -5,13 +5,13 @@ nconf.env().file({ file: 'config.json' });
 var sequelize = new Sequelize(nconf.get("POSTGRE_URI"));
 
 
-var ChatMessages = sequelize.define('chat_messages', {
-		id_chat: Sequelize.INTEGER,
-		id_user: Sequelize.INTEGER,
-        text: Sequelize.STRING
+var UserToChats = sequelize.define('chats', {
+        name: Sequelize.STRING,
+		user_id: Sequelize.INTEGER,
+		id_chat: Sequelize.INTEGER
     }, {
-        instanceMethods: {
-            retrieveById: function(mess_id, onSuccess, onError) {
+        instanceMethods: {//надо переписать
+            retrieveById: function(user_id, onSuccess, onError) {
                 //User.find({where: {id: user_id, email: 'eeeee2'}})
                 User.find({where: {id: user_id}})
                     .then(function(user){
@@ -22,8 +22,8 @@ var ChatMessages = sequelize.define('chat_messages', {
                         console.log("Project update failederewrewrew !");
                     });
             }
-		}
+    }
     }
 )
 
-module.exports = ChatMessages
+module.exports = UserToChats

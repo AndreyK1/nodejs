@@ -61,6 +61,8 @@ var port = process.env.PORT || 3001;
 var User = require('./models/Userseq');
 var Message = require('./models/messagesSeq');
 var ChatMessage = require('./models/chatMessagesSeq');
+var UserToChats = require('./models/userToChats');
+
 
 User.hasMany(Message, {foreignKey: 'user_id' });
 //User.hasMany(ChatMessage, {foreignKey: 'id_user' });
@@ -543,7 +545,11 @@ app.get('/numChatMess',ensureAuthorized, function(req, res) {
 						});
 							console.log('chatMessscol users HERE-12'+chatMessscol);
 						}else {
-						res.send(401, "chatMessscol not found1");
+						//res.send(401, "chatMessscol not found1");
+						res.json({
+							type: false,
+							data: "Сообщений в чате нет"
+						});
 					}
 
 					}).catch(function(error) {
@@ -571,7 +577,7 @@ app.post('/SaveChatMess',ensureAuthorized, function(req, res) {
 			console.log('SAveChatMessage-'+user.id);
 			//build({ text: text}).save()
 			//ChatMessage.add({id_chat: 1, id_user:user.id, text:text});
-			ChatMessage.build({id_chat: 1, id_user:user.id, text:text}).save()
+			ChatMessage.build({id_chat: user.id_chat, id_user:user.id, text:text}).save()
 				.then(function(mess){
 					console.log('сообщение сохранено SaveChatMess');
 					 res.json({
@@ -591,6 +597,85 @@ app.post('/SaveChatMess',ensureAuthorized, function(req, res) {
 						data: "user not found: " + err
 					});
                     console.log('Error HERE-SaveChatMess');
+         });
+});
+
+//равнивается ваш и его id_chat, если они разные
+app.post('/CheckChats',ensureAuthorized, function(req, res) {
+    console.log(req.body.id_meeted);
+	var id_meeted = req.body.id_meeted
+	//var user_id = req.body.user_id
+	//вытаскиваем пользователя
+	 // User.findAll({where: {token: req.token}}) //  
+	//User.findAll({where: {$or: [{token: req.token}, {id: id_meeted}]}})
+	sequelize.query("SELECT q.* , (select count(*) from users where id_chat=q.id_chat) col_us FROM users q WHERE id="+id_meeted+" OR token = '"+req.token+"' ORDER BY col_us DESC", 	
+	{ type: sequelize.QueryTypes.SELECT})
+	   .then(function(user){
+					console.log('чаты найдены');
+					res.json({
+						type: true,
+						data: user
+					});
+
+		}).catch(function(err) {
+                    res.json({
+						type: false,
+						data: "chats not found: " + err
+					});
+                    console.log('Error HERE-CheckChats');
+         });
+});
+
+//изменение пользовательских данных
+app.post('/ChangeUsersParam',ensureAuthorized, function(req, res) {
+    console.log(req.body.column);
+	var col = req.body.column
+	var val = req.body.value
+	var id_user = req.body.id_user
+	//if(id_user==0){ token= req.token;}
+	
+	if(id_user!=0){
+		//us = User.find({where: {id: id_user}})
+		//us = User.update({col: val},{where: {id: id_user}})
+		us = sequelize.query("UPDATE users SET "+col+" = '"+val+"' WHERE id='"+id_user+"' ") 	
+	}else{
+		us = sequelize.query("UPDATE users SET "+col+" = '"+val+"' WHERE token='"+req.token+"' ")
+		//us = User.find({where: {token: req.token}})
+		//us=User.update({foto: id_user+'.'+fn},{where: {id: id_user}})
+	}
+		us.then(function(user){
+					console.log('.юзеры найдены');
+					res.json({
+						type: true,
+						data: "ok"//user
+					});
+
+		}).catch(function(err) {
+                    res.json({
+						type: false,
+						data: "chats not found: " + err
+					});
+                    console.log('Error HERE-ChangeUsersParam');
+         });
+	
+});
+
+//равнивается ваш и его id_chat, если они разные
+app.put('/AddToChats/:id_chat/:id_user',ensureAuthorized, function(req, res) {
+	UserToChats.build({ id_chat: req.params.id_chat, user_id: req.params.id_user}).save()
+	   .then(function(chat){
+					console.log('польз-ль в чаты добавлен');
+					res.json({
+						type: true,
+						data: 'польз-ль в чаты добавлен'
+					});
+
+		}).catch(function(err) {
+                    res.json({
+						type: false,
+						data: 'польз-ль в чаты не добавлен' + err
+					});
+                    console.log('Error HERE-AddToChats');
          });
 });
 

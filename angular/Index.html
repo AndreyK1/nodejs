@@ -12,7 +12,9 @@
 	
 	<link rel="stylesheet" href="css/style.css">
 	<script src="scripts/controllers.js"></script>
+	<script src="scripts/factorys.js"></script>
 	<script src="scripts/routers.js"></script>	
+	<script src="scripts/directives.js"></script>
 	
 	<title>Restful Authentication with NodeJS & AngularJS</title>
 	
@@ -50,6 +52,13 @@
 </head>
 <!--<span data-toggle="popover" data-trigger="hover" title="Popover Header" data-content="Some content inside the popover" >gfdgfd</span>-->
 <body ng-app="angularRestfulAuth" ng-controller="HomeCtrl">
+<div>mess - {{data.mess}}</div>
+<div>err - {{data.err}}</div>
+<div>err - {{data.err}}</div>
+<div>PostUser.email - {{PostUser.email}}</div>
+
+
+
 	<div class="container"  >
 		<div class="row">
 			<div class="col-md-12">
@@ -68,6 +77,7 @@
 							 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 								<ul class="nav navbar-nav">
 									<li><a href="#/Chat/1">Chat</a></li>
+									<li><a href="#/admin">Admin</a></li>
 									<li class="dropdown">
 									  <a  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 											Dropdown <span class="caret"></span>

@@ -5,9 +5,12 @@ angular.module("angularRestfulAuth", [
     'ngStorage',
     'ngRoute'
 ])
-    .controller('HomeCtrl',  ['$rootScope', '$scope', '$location', '$localStorage', 'Main', function($rootScope, $scope, $location, $localStorage, Main)
+    .controller('HomeCtrl',  ['$rootScope', 'MyService' ,'$scope', '$location', '$localStorage', 'Main', function($rootScope, MyService,$scope, $location, $localStorage, Main)
 {
+	$scope.data = MyService.data;
+	//$scope.mess = $rootScope.mess;
 	//$rootScope.baseUrl = "http://localhost:3001";
+	$scope.PostUser = $localStorage.user;
 	
 	//alert('here');
 		//$scope.user={};
@@ -91,6 +94,7 @@ angular.module("angularRestfulAuth", [
            Main.logout(function(res) {
 				//alert('LOGOUT')
 				$scope.token =	null;
+				$localStorage.user = null;
 				//$scope.AllUsersCol = res.data;				
 				//alert($scope.AllUsersCol[0].email);
 				//$scope.AllUsers = JSON.parse(res.data);
@@ -125,6 +129,7 @@ angular.module("angularRestfulAuth", [
 					if(res.data.token){
 					   $localStorage.token = res.data.token;
 						$scope.token =$localStorage.token;
+					$localStorage.user = res.data;
 						$scope.user = res.data;
 						$scope.CurrentUser= res.data;
 						//$rootScope.user =  $scope.user;
@@ -146,96 +151,10 @@ angular.module("angularRestfulAuth", [
 	
 		$scope.token = $localStorage.token;
 }])
- .factory('Main', ['$rootScope','$http', '$localStorage', function($rootScope,$http, $localStorage){
-        var baseUrl = "http://localhost:3001";
-		$rootScope.baseUrl = baseUrl; 
-        function changeUser(user) {
-            angular.extend(currentUser, user);
-        }
- 
-        function urlBase64Decode(str) {
-            var output = str.replace('-', '+').replace('_', '/');
-            switch (output.length % 4) {
-                case 0:
-                    break;
-                case 2:
-                    output += '==';
-                    break;
-                case 3:
-                    output += '=';
-                    break;
-                default:
-                    throw 'Illegal base64url string!';
-            }
-            return window.atob(output);
-        }
- 
-        function getUserFromToken() {
-            var token = $localStorage.token;
-            var user = {};
-            if (typeof token !== 'undefined') {
-                var encoded = token.split('.')[1];
-                user = JSON.parse(urlBase64Decode(encoded));
-            }
-            return user;
-        }
- 
-        var currentUser = getUserFromToken();
- 
-        return {
-           // save: function(data, success, error) {
-            //    $http.post(baseUrl + '/signin', data).success(success).error(error)
-				//$http.get('http://api/user').then(function(response){responseData = response.data; });
-				//$http.post('/someUrl', data, config).then(successCallback, errorCallback);
-            //},
-            signin: function(data, success, error) {
-                $http.post(baseUrl + '/signin', data).success(success).error(error)
-            },
-            me: function(success, error) {
-                $http.get(baseUrl + '/me').success(success).error(error)
-            },
-			AllUsers: function(success, error) {
-                $http.get(baseUrl + '/AllUsers').success(success).error(error)
-            },
-			//localhost:3001/AllUsers/5/15
-			AllUsersWithin: function(data,success, error) {
-                $http.get(baseUrl + '/AllUsers/'+data.beg+'/'+data.num).success(success).error(error)
-            },
-            getCurrentUser: function(r) {
-                return currentUser;
-            },			
-            logout: function(success) {
-                changeUser({});
-                delete $localStorage.token;
-                success();
-            },			
-            login: function(data,success,error) {
-				$http.post(baseUrl + '/login', data).success(success).error(error)
-            }
-			
-			,
-			//saveFile: function (data,file,url) {
-				saveFile: function (data) {
-				//var url = conf.apiUrl;
-				//var fd = new FormData();
-				//fd.append('file', file);
-				//return $http({
-					$http({
-					method: 'POST',
-					url: baseUrl + '/SaveFile',
-					transformRequest: angular.identity,
-					data: data,
-					//data: fd,
-					headers: {'Content-Type': undefined}
-				});
-			}
-			
-        };
-		
-		
- }])
-    .controller('MeCtrl', ['$rootScope', '$scope','$http', '$location', 'Main', function($rootScope, $scope,$http, $location, Main) {
-	  var baseUrl = $rootScope.baseUrl
+
+    .controller('MeCtrl', ['$rootScope', '$scope','MyService','$http', '$location', 'Main', function($rootScope, $scope,MyService,$http, $location, Main) {
+	  //var baseUrl = $rootScope.baseUrl
+	  baseUrl=MyService.data.baseUrl;
 	 // var baseUrl = "http://localhost:3001";
 	  //$scope.user.token = 'shit';
            Main.me(function(res) {
@@ -305,9 +224,10 @@ angular.module("angularRestfulAuth", [
             })	  
 
 }])
-   .controller('PageUsersCtrl', ['$rootScope', '$scope','$routeParams','$sce', '$http','$location', 'Main', function($rootScope, $scope,$routeParams,$sce,$http,$location, Main) {
+   .controller('PageUsersCtrl', ['$rootScope', '$scope','MyService','$routeParams','$sce', '$http','$location', 'Main', function($rootScope, $scope,MyService,$routeParams,$sce,$http,$location, Main) {
          // alert('hhhhh');
-		  var baseUrl = $rootScope.baseUrl
+		   baseUrl=MyService.data.baseUrl;
+		  //var baseUrl = $rootScope.baseUrl
 	//	  var PathToNode = $rootScope.PathToNode
 		  
 		  $scope.sce = $sce;
@@ -429,18 +349,6 @@ angular.module("angularRestfulAuth", [
 		  }		  
 		  
 }])
- .directive('popoverEl', function() {
-    return {
-        // Restrict it to be an attribute in this case
-        restrict: 'A',
-        // responsible for registering DOM listeners as well as updating the DOM
-        link: function(scope, element, attrs) {
-            //$(element).toolbar(scope.$eval(attrs.toolbarTip));
-			$(element).popover(scope.$eval(attrs.popoverEl));
-        }
-    };
-})
-
  /*  .controller('SaveFile', ['$rootScope', '$scope', '$http', '$location', 'Main', function($rootScope, $scope, $http, $location, Main) {
            var baseUrl = "http://localhost:3001";
 		   var url = "http://localhost:3001";
@@ -629,59 +537,50 @@ angular.module("angularRestfulAuth", [
 		}
 		
 }])		
-   .controller('chatCntrl', ['$rootScope', '$scope','$routeParams','$http','$document', '$location', 'Main', function($rootScope, $scope,$routeParams,$http,$document,$location, Main) {
-	//	  $scope.sce = $sce;
-	//	  $scope.pageslist = '';
-		//$scope.chat_id;
+   .controller('chatCntrl', ['$rootScope', '$scope', '$localStorage', 'MyService','UserService','$timeout','$routeParams','$http','$document', '$location', 'Main', function($rootScope, $scope,$localStorage,MyService,UserService,$timeout,$routeParams,$http,$document,$location, Main) {
 		  $scope.currentPageNum = 1;
 		  $scope.PageNum = 1;
 		  $scope.pageSize = 4;
 		  $scope.numMessages =0;
+		  if(!$scope.mychats) $scope.mychats = [];
+		  $scope.mychats= $localStorage.mychats;
+		  
+		$scope.$watch('mychats', function() {
+			//alert('hey, myVar has changed!');
+			$localStorage.mychats =  $scope.mychats;
+		});	
+		 
+		  baseUrl=MyService.data.baseUrl;
+			//$scope.mychats.push({name:"mch1"})
+			//$scope.mychats.push({name:"mch2"})
 		
 		$scope.myMess = '';
 		
 		$scope.messages = [];
-		var baseUrl = $rootScope.baseUrl
+		//var baseUrl = $rootScope.baseUrl
 		
 		
 		if($routeParams.page)
 			$scope.currentPageNum =  $routeParams.page;		  
-		  
-		 // $scope.GetUsers = function(beg_id,end_id){
-		
 		
 		//получение сообщений из чата
 		$scope.GetMess  = function(beg,num){
-			  //alert("beg-"+beg+" num-"+num)
 			  var data={
 				  beg:beg,
 				  num:num
 			  }
-			//$http.get(baseUrl + '/chatMess/'+$scope.currentPageNum+"/"+).success(function(res){
 			$http.post(baseUrl + '/chatMess',data).success(function(res){
 					if (res.type == false) {
-						$scope.mess = 'получить сообщкения не удалось'
-					   //alert('подтверждение не удалось')    
+						MyService.data.mess = 'получить сообщкения не удалось'
 					} else {
 						$scope.messages = res.data
-					//	alert('scope.messages[0].text-'+$scope.messages[0].text)
-					//	GetnumChatMess(res.data[0].user.id_chat)
 						for(var i=0; i<$scope.messages.length; i++){
-							//alert($scope.messages[i].user.foto)
-							//alert('i='+i+fotoCheckCom(new Array($scope.messages[i].user))[0].foto)
 							$scope.messages[i].user = fotoCheckCom(new Array($scope.messages[i].user))[0];
 						}
-						//$scope.UsersOnPage = fotoCheckCom(res.data)	
-						
-					  //alert(res.data)  
-					  // $scope.numUssers = res.data;
-					   //$scope.PageNum = Math.ceil($scope.numUssers/$scope.pageSize);
-					   
-					  // GetPagesRow();
 					}	  
 					  }).error(function() {
-						  $scope.err ='получить сообщкения не удалось'
-							$rootScope.error = 'Failed to chatMess';
+						 MyService.data.err ='получить сообщкения не удалось'
+							
 					})
 		}
 		//$scope.GetMess($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.currentPageNum*$scope.pageSize+1 )
@@ -689,49 +588,38 @@ angular.module("angularRestfulAuth", [
 		
 		//сохранение сообщения
 		$scope.saveMess = function(){
-			//alert($scope.myMess);
 						var data = {
-							//id_user: 675,
 							chatMess: $scope.myMess
 						}
 
 					$http.post(baseUrl + '/SaveChatMess', data).success(function(res){
 			  	if (res.type == false) {
-					$scope.err = 'coхранить сообщкение не удалось'
+					MyService.data.err = 'coхранить сообщкение не удалось'
                    alert(res.data)    
                 } else {
 					  
 					  alert("ok "+res.data)  
 					  $scope.GetMess($scope.currentPageNum*$scope.pageSize-$scope.pageSize, $scope.pageSize )
-					  // $scope.numUssers = res.data;
-					   //$scope.PageNum = Math.ceil($scope.numUssers/$scope.pageSize);
-					   
-					  // GetPagesRow();
 					}	  
 				  }).error(function() {
-					  $scope.err ='coхранить сообщкение не удалось'
-						$rootScope.error = 'Failed to chatMess';
+					  MyService.data.err ='coхранить сообщкение не удалось'
+						
 				})
 			
 		}
 		
 		
 		function GetnumChatMess(){
-			//alert('GetnumChatMess-')
-			//$http.get(baseUrl + '/numChatMess/'+id_chat).success(function(res){
 			$http.get(baseUrl + '/numChatMess').success(function(res){
 					if (res.type == false) {
-					   // alert(res.data)    
+						MyService.data.mess = res.data;
 					} else {
-						//alert(res.data);
 					   $scope.numMess = res.data;
-					   //alert('scope.numMess-'+$scope.numMess)
 					   $scope.PageNum = Math.ceil($scope.numMess/$scope.pageSize);
-					   
-					   GetPagesRow();
+						GetPagesRow();
 					}	  
 			  }).error(function() {
-					$rootScope.error = 'Failed to numUssers';
+					MyService.data.err = 'Failed to numUssers';
 					}	  
 			  )
 		}
@@ -740,51 +628,179 @@ angular.module("angularRestfulAuth", [
 		$scope.pages=[];
 		$scope.pagesShow=[];
 		  function GetPagesRow(){//рисуем страницы
-				//alert($scope.pages); 			  
+  
 			  for(var i=1; i< $scope.PageNum+1;i++){
 					$scope.pages.push({num : i//, 
-									//beg : i*$scope.pageSize-$scope.pageSize+1, 
-									//end : i*$scope.pageSize+1	
 									})				  
 				  
 				  if((i>$scope.currentPageNum-2) && (i<$scope.currentPageNum-1+3)){//отсекаем только нужные 
-					//console.log(' i-'+i+' currentPageNum-'+$scope.currentPageNum)
 							$scope.pagesShow.push({num : i//, 
 							})
 				  }				
 			  }
-			//alert($scope.pages);
-		  }	
+		  }
+
+		  $scope.id_meeted = 0;
+		  $scope.chats = []
+		  //var baseUrl = $rootScope.baseUrl
+		  //встретить пользователя
+		  $scope.MeetUser = function(){
+			  //-=-!!!!!!!!
+/**/		  //Важно создать массив пользователей, с которыми встретился (и время), чтобы повторно не запрашивать сервер (или запрашивать если встретился более 10мин назад)
+
+			  if($scope.id_meeted == 0) return;
+			  
+			  //сравнивается ваш и его id_chat, если они разные, 
+			  //то сравнивается, в каком больше пользователей и туда и переходит пользователь
+			  //если кол-во людей в чате одинаковое, то переход на с меньшим индексом
+				var data = {
+					id_meeted: $scope.id_meeted
+				}
+				$http.post(baseUrl + '/CheckChats',data).success(function(res){
+			  	if (res.type == false) {
+					MyService.data.err = 'проверить чаты не удалось'
+                   alert(res.data)    
+                } else {
+					  $scope.chats = res.data;
+					   checkChsats($scope.chats);
+					}	  
+				  }).error(function() {
+					  MyService.data.err ='проверить чаты не удалось'
+						$rootScope.error = 'Failed to CheckChats';
+				})			  
+			  
+		  }
+		  
+		  //проверяем в чьем (из встретившихся) чате больше человек, и если, что предлагаем сменить чат
+		  function checkChsats(chats){
+				if(chats.length >1){
+					var meChat=[];
+					var otherChat=[];
+					for(var i=0; i<chats.length; i++){
+						if(chats[i].email == $scope.CurrentUser.email){
+							meChat=chats[i];
+						}else{
+							otherChat=chats[i];
+						}
+					}
+					if(meChat.id_chat && otherChat.id_chat){
+						if(meChat.id_chat == otherChat.id_chat){
+							alert("чаты одинаковы");
+							return;
+						}else{
+							var active = false; //активным ли будет чат (перейдем ли в него)
+							AddChatToMychats(meChat,true);
+							
+							var str = '';
+							if(meChat.col_us > otherChat.col_us){
+								str = "В нашем чате больше человек!";
+							}
+							if(meChat.col_us <= otherChat.col_us){
+								str = "В другом чате больше человек!";
+							}
+							var go =confirm(str+" Хотите перейти?");
+							if(go){ 	
+								//ChangeUsersParam('id_chat',otherChat.id_chat,0);
+								//var callbacArray = array($scope.currentPageNum*$scope.pageSize,$scope.pageSize, $scope.pageSize)
+									//	otherChat.id_chat
+									$scope.ChangeChat(otherChat.id_chat);							
+
+								
+								/*$timeout(function(){ $scope.GetMess(1*$scope.pageSize-$scope.pageSize, $scope.pageSize);
+								$scope.pages=[]; $scope.pagesShow=[]; GetnumChatMess(); $scope.currentPageNum = 1;//GetPagesRow();
+								},2000);*/
+								active = true;
+								
+							}							
+							$scope.mychats = AddChatToMychats(otherChat,active,$scope.mychats);
+							//$localStorage.mychats = AddChatToMychats(otherChat,active,$scope.mychats);
+						}
+					}
+				}	  
+		  }
+		  
+		
+		function AddChatToMychats(chat,active,mychats){
+			//var i=3;
+			//for(var i=0;i<mychats.length;)
+			var newA = [];
+			for (var key in mychats){
+				if(active = true){
+					mychats[key]['active'] = false;
+				}
+				if(mychats[key]['id_chat'] != chat['id_chat']){
+					newA.push(mychats[key]);
+				}
+			}
+			AddChatToTable(chat['id_chat'],$localStorage.user.id);
+			chat['active'] = active;
+			newA.push(chat);
+			return newA;
+		}
+		
+		function AddChatToTable(id_chat,id_user){//внесение меня в таблицу чата
+				//alert('добавление-'+id_chat+' '+id_user)
+				if(!id_user){ MyService.data.err ='нет id пользователя'; return; }
+				$http.put(baseUrl + '/AddToChats/'+id_chat+"/"+id_user).success(function(res){
+			  	if (res.type == false) {
+					MyService.data.err = 'добавить к чату не удалось'
+                  // alert(res.data)    
+                } else {
+					  MyService.data.mess = res.data;
+					  //$scope.chats = res.data;
+					  // checkChsats($scope.chats);
+					}	  
+				  }).error(function() {
+					  MyService.data.err ='добавить к чату не удалось'
+				})
+		}
+		//otherChat.id_chat
+		$scope.ChangeChat = function(id_chat){
+			//alert(id_chat);
+			UserService.ChangeUsersParam('id_chat',id_chat,0,function(){
+				//alert('cb');
+				$scope.GetMess(1*$scope.pageSize-$scope.pageSize, $scope.pageSize);
+				$scope.pages=[]; $scope.pagesShow=[]; GetnumChatMess(); $scope.currentPageNum = 1;//GetPagesRow();
+			});			
+		}
+		
+		
+		  
 		
  }])	
- /*;
+   .controller('adminCntrl', ['$rootScope', 'MyService','UserService','$scope','$routeParams','$http','$document', '$location', 'Main', function($rootScope, MyService,UserService,$scope,$routeParams,$http,$document,$location, Main) {
 
-angular.module('angularRestfulAuth', [
-    'ngStorage',
-    'ngRoute'
-])*/
-/*
-.config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
- 
-    $routeProvider.
-        when('/', {
-            templateUrl: 'partials/home.html',
-            controller: 'HomeCtrl'
-        }).
-        when('/signin', {
-            templateUrl: 'partials/signin.html',
-            controller: 'HomeCtrl'
-        }).
-        when('/signup', {
-            templateUrl: 'partials/signup.html',
-            controller: 'HomeCtrl'
-        }).
-        when('/me', {
-            templateUrl: 'partials/me.html',
-            controller: 'HomeCtrl'
-        }).
-        otherwise({
-            redirectTo: '/'
-        }); 
-		 }])
-//}]);*/
+		  
+		  
+		  //$scope.data = MyService.data;
+		  
+		  //$scope.data.mess = "обновили";
+		  //изменение пользовательских данных
+		 /* function ChangeUsersParam(col,val,id_user){
+			  //если id_user=0, то у текущего пользователя
+			  alert('ChangeUsersParam');
+			  	var data = {
+					column: col,
+					value:val,
+					id_user:id_user
+				}
+				$http.post(baseUrl + '/ChangeUsersParam',data).success(function(res){
+			  	if (res.type == false) {
+					$scope.err = 'сменить чат не удалось'
+                   alert(res.data)    
+                } else {
+					 // $scope.chats = res.data;
+					  
+					  alert("ok "+res.data) 
+					  $scope.data.mess = "обновили";
+					//$rootScope.mess = "обновили";
+					//$scope.data.mess = "обновили";
+						alert("обновили")
+					  //checkChsats();
+					}	  
+				  }).error(function() {
+					  $scope.err ='проверить чаты не удалось'
+						$rootScope.error = 'Failed to ChangeUsersParam';
+				})	
+		  }*/
+ }])
