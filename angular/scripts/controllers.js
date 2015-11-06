@@ -764,7 +764,42 @@ angular.module("angularRestfulAuth", [
 			});			
 		}
 		
-		
+		$scope.updateChats = function(){
+	/**/	//в будущем сделаем чтобы если чаты более чем 20 минут как не посещялись, то убиваем их
+				//1. обновляем время посещения чата
+				//2. вытаскиваем чаты и кол-во человек в них
+				//new Date().getTime();
+				var data = {
+					id_user: $localStorage.user.id
+				}
+				$http.post(baseUrl + '/updateChats/',data).success(function(res){
+			  	if (res.type == false) {
+					MyService.data.err = 'обновить чаты не удалось'
+                   alert(res.data)    
+                } else {
+					 MyService.data.mess ='чаты обновлены'
+					for (var key in $scope.mychats){
+						for (var key2 in res.data){
+							if($scope.mychats[key]['id_chat'] == res.data[key2]['id_chat']){
+								//alert('id_chat='+$scope.mychats[key]['id_chat'])
+								$scope.mychats[key]['col_us'] = res.data[key2]['col_us']
+							}
+						}
+							//$scope.mychats[key]['active'] = false;
+						/*if(mychats[key]['id_chat'] != chat['id_chat']){
+							newA.push(mychats[key]);
+						}*/
+					}
+
+					 //$scope.mychats
+					 
+					 // $scope.chats = res.data;
+					 //  checkChsats($scope.chats);
+					}	  
+				  }).error(function() {
+					  MyService.data.err ='обновить чаты не удалось'
+				})		
+		}
 		  
 		
  }])	

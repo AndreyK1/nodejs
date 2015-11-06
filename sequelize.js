@@ -679,6 +679,49 @@ app.put('/AddToChats/:id_chat/:id_user',ensureAuthorized, function(req, res) {
          });
 });
 
+//равнивается ваш и его id_chat, если они разные
+app.post('/updateChats',ensureAuthorized, function(req, res) {
+	//UserToChats.build({ id_chat: req.post.id_chat, user_id: req.params.id_user}).save()
+	//.update({foto: id_user+'.'+fn},{where: {id: id_user}})
+	
+	//обновляем последнее помсещение чата
+	var tms = new Date().getTime();
+	User.find({where: {token: req.token}})
+		.then(function(user){
+				//UserToChats.update({ updatedAt: tms},{where: {user_id: req.body.id_user,id_chat:req.body.id_chat}})
+				UserToChats.update({ updatedAt: tms},{where: {user_id: user.id,id_chat:user.id_chat}})
+				GetChats(user);
+				console.log('here updateChats');
+		}).catch(function(err) {
+                    res.json({
+						type: false,
+						data: 'обновить чат не получилось' + err
+					});
+                    console.log('Error HERE-updateChats');
+         });	
+
+		function GetChats(user){//возврашаем чаты в которых пользователь и кол-во чел в них
+				 //вытаскиваем все чаты и сколько в них людей 
+				sequelize.query("SELECT ch.*, (select count(*) from chats where id_chat=ch.id_chat) col_us FROM chats ch WHERE user_id = "+user.id, 	
+				{ type: sequelize.QueryTypes.SELECT})
+				.then(function(chats){
+						console.log('here updateChats111');
+							res.json({
+								type: true,
+								data: chats
+							});
+						
+				}).catch(function(err) {
+							res.json({
+								type: false,
+								data: 'обновить чат не получилось' + err
+							});
+							console.log('Error HERE-updateChats1');
+				 });
+		}			
+
+});
+
 
 
 app.set("view options", {layout: false});
