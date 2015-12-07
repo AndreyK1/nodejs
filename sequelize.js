@@ -57,7 +57,7 @@ sequelize.sync().then(function() {
 });*/
 
 
-var port = process.env.PORT || 3001;
+var port = process.env.PORT || 80;
 var User = require('./models/Userseq');
 var Message = require('./models/messagesSeq');
 var ChatMessage = require('./models/chatMessagesSeq');

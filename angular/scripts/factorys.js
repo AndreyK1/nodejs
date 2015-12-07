@@ -4,7 +4,8 @@ angular.module("angularRestfulAuth")
     data: {
       mess: "1",
 	  err: "",
-      baseUrl: "http://localhost:3001"
+     // baseUrl: "http://localhost"
+	 baseUrl: "http://192.168.123.168"
     }
   };
 })
