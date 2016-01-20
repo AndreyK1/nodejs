@@ -395,6 +395,7 @@ app.post('/login', function(req, res) {
 });
 
 function ensureAuthorized(req, res, next) {
+	console.log('here 2222222');
     var bearerToken;
     var bearerHeader = req.headers["authorization"];
 	console.log('bearerHeader HERE-8'+bearerHeader);
